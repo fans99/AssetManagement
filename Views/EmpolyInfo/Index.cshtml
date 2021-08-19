@@ -1,0 +1,575 @@
+﻿@model AssetManagement.ViewModels.EmpolyInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "员工管理";
+    Page.ActiveIndex = 0;
+    Page.SubIndex = 3;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="EmpolyID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">员工编号:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="EmpolyNum" autocomplete="off" required onblur="existAction()" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">员工姓名:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="EmpolyName" autocomplete="off" required class="layui-input" placeholder="请输入员工姓名">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">员工性别:</label>
+                <div class="layui-input-block flex items-center">
+                    <div class="mr-5">
+                        <input type="radio" class="text-blue-400" name="EmpolySex" value="男" checked /><span class="ml-2">男</span>
+                    </div>
+                    <div>
+                        <input type="radio" class="text-blue-400" name="EmpolySex" value="女" /><span class="ml-2">女</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">身份证号:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="EmpolyldCard" autocomplete="off" required class="layui-input" >
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">所属部门:</label>
+                <div class="layui-input-block">
+                    <select id="DeptID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (DeptInfo item in Model.DeptInfoList)
+                        {
+                            <option value="@item.DeptID">@item.DeptName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">岗位级别:</label>
+                <div class="layui-input-block">
+                    <select id="EmpolyLevel" class="w-full h-14 pl-3 border cursor-pointer">
+                        <option value="1">普通员工</option>
+                        <option value="2">部门主管</option>
+                        <option value="3">校区负责人</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">员工角色:</label>
+                <div class="layui-input-block">
+                    <select id="RoleID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (RoleInfo item in Model.RoleInfoList)
+                        {
+                            <option value="@item.RoleID">@item.RoleName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">入职时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="InductionDate" autocomplete="off" class="layui-input" placeholder="点击选择入职时间">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">离职时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="DepartureDate" autocomplete="off" class="layui-input" placeholder="点击选择离职时间">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">备注:</label>
+                <div class="layui-input-block">
+                    <textarea id="EmpolyReMark" class="border outline-none w-full h-32 pl-4 py-1" placeholder="请输入备注"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">添加</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <span>姓名:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="flex items-center mr-5">
+                <span>部门:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="SearchDeptID" class="-ml-2" data-value="0">全部</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul id="DeptList" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        @foreach (DeptInfo item in Model.DeptInfoList)
+                        {
+                            <li><a class="dropdown-item cursor-pointer" data-value="@item.DeptID">@item.DeptName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex items-center mr-5">
+                <span>角色:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="SearchRoleID" class="-ml-2" data-value="0">全部</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul id="RoleList" class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        @foreach (RoleInfo item in Model.RoleInfoList)
+                        {
+                            <li><a class="dropdown-item cursor-pointer" data-value="@item.RoleID">@item.RoleName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>性别:</span>
+                <div class="layui-input-inline">
+                    <input type="radio" class="text-blue-400" name="SearchSex" value="男" title="男" />
+                    <input type="radio" class="text-blue-400" name="SearchSex" value="女" title="女" />
+                    <input type="radio" class="text-blue-400" name="SearchSex" value="" title="全部" checked/>
+                </div>
+            </div>
+
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" class="bg-white" lay-filter="demo">
+</table>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchDeptID: '0',
+            SearchRoleID: '0',
+            SearchSex: '',
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/EmpolyInfo/GetEmpolyInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+                bindChange()
+            },
+            cols: [[
+                {
+                    title: '员工ID',
+                    field: 'EmpolyID',
+                    width: 100
+                },
+                {
+                    title: '员工编号',
+                    field: 'EmpolyNum',
+                },
+                {
+                    title: '姓名',
+                    field: 'EmpolyName',
+                },
+                {
+                    title: '性别',
+                    field: 'EmpolySex',
+                },
+                {
+                    title: '身份证号码',
+                    field: 'EmpolyldCard',
+                },
+                {
+                    title: '部门',
+                    field: 'DeptName',
+                },
+                {
+                    title: '级别',
+                    field: 'EmpolyLevel',
+                    templet: function (d) {
+                        if (d.EmpolyLevel === 1) {
+                            return '普通员工'
+                        }
+                        else if (d.EmpolyLevel === 2) {
+                            return '部门主管'
+                        }
+                        else if (d.EmpolyLevel === 3) {
+                            return '校区负责人'
+                        }
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '角色',
+                    field: 'RoleName',
+                },
+                {
+                    title: '入职日期',
+                    field: 'InductionDate',
+                },
+                {
+                    title: '离职日期',
+                    field: 'DepartureDate',
+                },
+                {
+                    title: '备注',
+                    field: 'EmpolyReMark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 130,
+                    templet:
+                        `<div>
+                                <button class="layui-btn layui-btn-xs layui-btn-warm" onclick="updateClick({{d.LAY_TABLE_INDEX}})">编辑</button>
+                                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="removeClick({{d.LAY_TABLE_INDEX}})">删除</button>
+                        </div>`
+                },
+            ]]
+        });
+
+        function validateFormat() {
+            var result = true
+            var EmpolyNum = $('#EmpolyNum')
+            if (!/^[0-9]{6}$/.test(EmpolyNum.val())) {
+                EmpolyNum.addClass('border-red-400')
+                EmpolyNum.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var EmpolyName = $('#EmpolyName')
+            if (EmpolyName.val() === '') {
+                EmpolyName.addClass('border-red-400')
+                EmpolyName.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var EmpolyldCard = $('#EmpolyldCard')
+            var reCard = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+            if (!reCard.test(EmpolyldCard.val())) {
+                EmpolyldCard.addClass('border-red-400')
+                EmpolyldCard.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var InductionDate = $('#InductionDate')
+            if (InductionDate.val() === '' || isNaN(new Date(InductionDate.val()).getDate())) {
+                InductionDate.addClass('border-red-400')
+                InductionDate.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var DepartureDate = $('#DepartureDate')
+            if (DepartureDate.val() != '' && isNaN(new Date(InductionDate.val()).getDate())) {
+                DepartureDate.addClass('border-red-400')
+                DepartureDate.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            return result
+        }
+
+        function bindChange() {
+            $('#DeptList .dropdown-item').click(function (event) {
+                var SearchDeptID = document.getElementById('SearchDeptID')
+                $(SearchDeptID).text(event.target.innerText)
+                SearchDeptID.dataset['value'] = event.target.dataset['value']
+            })
+
+            $('#RoleList .dropdown-item').click(function (event) {
+                var SearchRoleID = document.getElementById('SearchRoleID')
+                $(SearchRoleID).text(event.target.innerText)
+                SearchRoleID.dataset['value'] = event.target.dataset['value']
+            })
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            document.getElementById('SearchDeptID').dataset['value'] = searchParams.SearchDeptID
+            $('#DeptList .dropdown-item').get().forEach(item => {
+                if (item.dataset['value'] === searchParams.SearchDeptID)
+                    $('#SearchDeptID').text(item.innerText)
+            })
+            document.getElementById('SearchRoleID').dataset['value'] = searchParams.SearchRoleID
+            $('#RoleList .dropdown-item').get().forEach(item => {
+                if (item.dataset['value'] === searchParams.SearchRoleID)
+                    $('#SearchRoleID').text(item.innerText)
+            })
+            $('input[name="SearchSex"]').get().forEach(item => {
+                if (item.value === searchParams.SearchSex)
+                    $(item).next('.layui-form-radio').trigger('click')
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchDeptID = document.getElementById('SearchDeptID').dataset['value']
+            searchParams.SearchRoleID = document.getElementById('SearchRoleID').dataset['value']
+            searchParams.SearchSex = $('input[name="SearchSex"]:checked').val()
+            table.reload('dataTable', {
+                url: '/EmpolyInfo/GetEmpolyInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchDeptID: searchParams.SearchDeptID,
+                    SearchRoleID: searchParams.SearchRoleID,
+                    SearchSex: searchParams.SearchSex
+                },
+            }, true);
+        }
+
+        function existAction() {
+            $.ajax({
+                url: '/EmpolyInfo/Exist',
+                method: 'get',
+                data: {
+                    EmpolyNum: $('#EmpolyNum').val()
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.msg('员工编号已存在')
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '添加员工',
+                area: ['600px', '750px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            $('#EmpolyNum').removeAttr('disabled')
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('添加').click(submitClick)
+            $('#InductionDate, #DepartureDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '修改员工',
+                area: ['600px', '750px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $('#EmpolyID').val(rowData.EmpolyID)
+            $('#EmpolyNum').val(rowData.EmpolyNum).attr('disabled', 'disabled')
+            $('#EmpolyName').val(rowData.EmpolyName)
+            $('input[name="EmpolySex"]').get().forEach(item => {
+                if (item.value === rowData.EmpolySex)
+                    item.checked = true
+                else
+                    item.checked = false
+            })
+            $('#EmpolyldCard').val(rowData.EmpolyldCard)
+            $('#DeptID').val(rowData.DeptID)
+            $('#EmpolyLevel').val(rowData.EmpolyLevel)
+            $('#RoleID').val(rowData.RoleID)
+            $('#InductionDate').val(rowData.InductionDate)
+            $('#DepartureDate').val(rowData.DepartureDate)
+            $('#EmpolyReMark').val(rowData.EmpolyReMark)
+            document.getElementById('submitButton').dataset['type'] = 'update'
+            $('#submitButton').text('修改').click(submitClick)           
+            $('#InductionDate, #DepartureDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function submitClick(event) {
+            if (!validateFormat())
+                return false
+
+            if (event.target.dataset['type'] === 'create') {
+                $.ajax({
+                    url: '/EmpolyInfo/Exist',
+                    method: 'get',
+                    data: {
+                        EmpolyNum: $('#EmpolyNum').val()
+                    },
+                    success: function (data) {
+                        if (data.code === 0) {
+                            layer.msg('员工编号已存在')
+                        }
+                        else {
+                            $.ajax({
+                                url: '/EmpolyInfo/Create',
+                                method: 'post',
+                                data: {
+                                    EmpolyNum: $('#EmpolyNum').val(),
+                                    EmpolyName: $('#EmpolyName').val(),
+                                    EmpolySex: $('input[name="EmpolySex"]:checked').val(),
+                                    EmpolyldCard: $('#EmpolyldCard').val(),
+                                    DeptID: $('#DeptID').val(),
+                                    EmpolyLevel: $('#EmpolyLevel').val(),
+                                    RoleID: $('#RoleID').val(),
+                                    InductionDate: $('#InductionDate').val(),
+                                    DepartureDate: $('#DepartureDate').val(),
+                                    EmpolyReMark: $('#EmpolyReMark').val().trim(),
+                                },
+                                success: function (_data) {
+                                    if (_data.code === 0) {
+                                        layer.alert('添加成功', {
+                                            title: '提示',
+                                            icon: 1
+                                        }, index => {
+                                            table.reload('dataTable')
+                                            layer.close(index)
+                                        })
+                                        layer.closeAll('page')
+                                    }
+                                    else {
+                                        layer.alert('添加失败', {
+                                            title: '提示',
+                                            icon: 2
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                })               
+            }
+            else if (event.target.dataset['type'] === 'update') {
+                $.ajax({
+                    url: '/EmpolyInfo/Update',
+                    method: 'post',
+                    data: {
+                        EmpolyID: $('#EmpolyID').val(),
+                        EmpolyName: $('#EmpolyName').val(),
+                        EmpolySex: $('input[name="EmpolySex"]:checked').val(),
+                        EmpolyldCard: $('#EmpolyldCard').val(),
+                        DeptID: $('#DeptID').val(),
+                        EmpolyLevel: $('#EmpolyLevel').val(),
+                        RoleID: $('#RoleID').val(),
+                        InductionDate: $('#InductionDate').val(),
+                        DepartureDate: $('#DepartureDate').val(),
+                        EmpolyReMark: $('#EmpolyReMark').val().trim(),
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('修改成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('修改失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }           
+        }
+
+        function removeClick(index) {
+            $.ajax({
+                url: '/EmpolyInfo/Delete',
+                method: 'post',
+                data: {
+                    id: table.getData('dataTable')[index].EmpolyID
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('删除成功', {
+                            title: '提示',
+                            icon: 1
+                        }, function (index) {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+
+                    }
+                    else {
+                        layer.alert('删除失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

@@ -1,0 +1,315 @@
+﻿@model AssetManagement.ViewModels.AssetInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "资产管理";
+    Page.ActiveIndex = 1;
+    Page.SubIndex = 2;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="AssetID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetName" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产类别:</label>
+                <div class="layui-input-block">
+                    <select id="AssetTypeID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (AssetTypeInfo item in Model.AssetTypeInfoList)
+                        {
+                            <option value="@item.AssetTypeID">@item.AssetTypeName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产型号:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetModel" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">单位:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetCompany" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产说明:</label>
+                <div class="layui-input-block">
+                    <textarea id="AssetReMark" class="border outline-none w-full h-32 pl-4 py-1"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">添加</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>资产名称:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+            <div class="flex items-center">
+                <span>资产类别:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="SearchAssetTypeID" class="-ml-2" data-value="0">全部</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        @foreach (AssetTypeInfo item in Model.AssetTypeInfoList)
+                        {
+                            <li><a class="dropdown-item cursor-pointer" data-value="@item.AssetTypeID">@item.AssetTypeName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="ml-5">
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchAssetTypeID: '0',
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/AssetInfo/GetAssetInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+                bindChange()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'AssetID',
+                },
+                {
+                    title: '资产名称',
+                    field: 'AssetName',
+                },
+                {
+                    title: '资产类别',
+                    field: 'AssetTypeName',
+                },
+                {
+                    title: '规格型号',
+                    field: 'AssetModel',
+                },
+                {
+                    title: '单位',
+                    field: 'AssetCompany',
+                },
+                {
+                    title: '备注',
+                    field: 'AssetReMark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 130,
+                    templet:
+                        `<div>
+                                <button class="layui-btn layui-btn-xs layui-btn-warm" onclick="updateClick({{d.LAY_TABLE_INDEX}})">编辑</button>
+                                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="removeClick({{d.LAY_TABLE_INDEX}})">删除</button>
+                        </div>`
+                },
+            ]]
+        });
+
+        function bindChange() {
+            $('.dropdown-item').click(function (event) {
+                var SearchAssetTypeID = document.getElementById('SearchAssetTypeID')
+                $(SearchAssetTypeID).text(event.target.innerText)
+                SearchAssetTypeID.dataset['value'] = event.target.dataset['value']
+            })
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            document.getElementById('SearchAssetTypeID').dataset['value'] = searchParams.SearchAssetTypeID
+            $('.dropdown-item').get().forEach(item => {
+                if (item.dataset['value'] === searchParams.SearchAssetTypeID)
+                    $('#SearchAssetTypeID').text(item.innerText)
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchAssetTypeID = document.getElementById('SearchAssetTypeID').dataset['value']
+            table.reload('dataTable', {
+                url: '/AssetInfo/GetAssetInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchAssetTypeID: searchParams.SearchAssetTypeID,
+                },
+            }, true);
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '添加区域',
+                area: ['600px', '470px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('添加').click(submitClick)
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '修改区域',
+                area: ['600px', '470px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $('#AssetID').val(rowData.AssetID)
+            $('#AssetName').val(rowData.AssetName)
+            $('#AssetTypeID').val(rowData.AssetTypeID)
+            $('#AssetModel').val(rowData.AssetModel)
+            $('#AssetCompany').val(rowData.AssetCompany)
+            $('#AssetReMark').val(rowData.AssetReMark)
+            document.getElementById('submitButton').dataset['type'] = 'update'
+            $('#submitButton').text('修改').click(submitClick)
+        }
+
+        function submitClick(event) {
+            if (event.target.dataset['type'] === 'create') {
+                $.ajax({
+                    url: '/AssetInfo/Create',
+                    method: 'post',
+                    data: {
+                        AssetName: $('#AssetName').val(),
+                        AssetTypeID: $('#AssetTypeID').val(),
+                        AssetModel: $('#AssetModel').val(),
+                        AssetCompany: $('#AssetCompany').val(),
+                        AssetReMark: $('#AssetReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('添加成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('添加失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+            else if (event.target.dataset['type'] === 'update') {
+                $.ajax({
+                    url: '/AssetInfo/Update',
+                    method: 'post',
+                    data: {
+                        AssetID: $('#AssetID').val(),
+                        AssetName: $('#AssetName').val(),
+                        AssetTypeID: $('#AssetTypeID').val(),
+                        AssetModel: $('#AssetModel').val(),
+                        AssetCompany: $('#AssetCompany').val(),
+                        AssetReMark: $('#AssetReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('修改成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('修改失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+        }
+
+        function removeClick(index) {
+            $.ajax({
+                url: '/AssetInfo/Delete',
+                method: 'post',
+                data: {
+                    id: table.getData('dataTable')[index].AssetID
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('删除成功', {
+                            title: '提示',
+                            icon: 1
+                        }, index => {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+
+                    }
+                    else {
+                        layer.alert('删除失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

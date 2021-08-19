@@ -1,0 +1,393 @@
+﻿@model AssetManagement.ViewModels.OfficeSuppliesRecordInfoIndexViewModel
+@{
+    Page.Title = "办公用品领用";
+    Page.ActiveIndex = 4;
+    Page.SubIndex = 0;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script id="ApplyForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产名称:</label>
+                <div class="layui-input-block">
+                    <select id="AssetID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (var item in Model.AssetInfoList)
+                        {
+                            <option value="@item.AssetID">@item.AssetName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">申请数量:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="OfficeApplyNum" autocomplete="off" required class="layui-input" placeholder="请输入申请数量">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">申请时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="OfficeApplyDate" autocomplete="off" required class="layui-input" placeholder="请选择申请时间">
+                </div>
+            </div>
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="applyButton" class="layui-btn layui-btn-normal">申请</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script id="UpdateForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="OfficeID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">库存数量:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetCount" autocomplete="off" disabled class="layui-input bg-gray-100">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">批准数量:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="OfficeReceiveNum" autocomplete="off" required class="layui-input" placeholder="请输入批准数量">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">批准时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="OfficeReceiveDate" autocomplete="off" required class="layui-input" placeholder="请选择批准时间">
+                </div>
+            </div>
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="updateButton" class="layui-btn layui-btn-normal">批准</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <span>资产名称:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>申请人:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchEmpolyName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>状态:</span>
+                <div class="layui-input-inline">
+                    <input type="radio" class="text-blue-400" name="SearchOfficeApplyState" value="0" title="申请中" />
+                    <input type="radio" class="text-blue-400" name="SearchOfficeApplyState" value="1" title="已领取" />
+                    <input type="radio" class="text-blue-400" name="SearchOfficeApplyState" value="" title="全部" checked />
+                </div>
+            </div>
+
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button class="layui-btn layui-btn-sm" onclick="applyClick()">申请办公用品</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+</table>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchEmpolyName: '',
+            SearchOfficeApplyState: ''
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/OfficeSuppliesRecordInfo/GetOfficeSuppliesRecordInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'OfficeID',
+                    width: 100
+                },
+                {
+                    title: '资产名称',
+                    field: 'AssetName',
+                },
+                {
+                    title: '申请人',
+                    field: 'EmpolyName',
+                },
+                {
+                    title: '申请时间',
+                    field: 'OfficeApplyDate',
+                },
+                {
+                    title: '申请数量',
+                    field: 'OfficeApplyNum',
+                },
+                {
+                    title: '申请状态',
+                    field: 'OfficeApplyState',
+                    templet: function (d) {
+                        if (d.OfficeApplyState === 0)
+                            return '申请中'
+                        else if (d.OfficeApplyState === 1)
+                            return '已领取'
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '审批时间',
+                    field: 'OfficeReceiveDate',
+                },
+                {
+                    title: '审批数量',
+                    field: 'OfficeReceiveNum',
+                },
+                {
+                    title: '备注',
+                    field: 'OfficeRemark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 100,
+                    hide: @(Model.IsAdmin ? "false" : "true"),
+                    templet: function (d) {
+                        if (d.OfficeApplyState === 0)
+                            return `<button class="layui-btn layui-btn-xs layui-btn-danger" onclick="updateClick(${d.LAY_TABLE_INDEX})">同意</button>`
+                        else
+                            return `<span class="text-red-400">已审批</span>`
+                    }
+                },
+            ]]
+        });
+
+        function validateFormat(FormName) {
+            var result = true
+            if (FormName === 'UpdateForm') {
+                var OfficeReceiveNum = $('#OfficeReceiveNum')
+                if (!/^[0-9]+$/.test(OfficeReceiveNum.val()) || parseInt(OfficeReceiveNum.val()) > parseInt($('#AssetCount').val())) {
+                    OfficeReceiveNum.addClass('border-red-400')
+                    OfficeReceiveNum.blur(function (event) {
+                        $(event.target).removeClass('border-red-400')
+                    })
+                    result = false
+                }
+
+                var OfficeReceiveDate = $('#OfficeReceiveDate')
+                if (OfficeReceiveDate.val() === '' || isNaN(new Date(OfficeReceiveDate.val()).getDate())) {
+                    OfficeReceiveDate.addClass('border-red-400')
+                    OfficeReceiveDate.blur(function (event) {
+                        $(event.target).removeClass('border-red-400')
+                    })
+                    result = false
+                }
+            }
+            else if (FormName === 'ApplyForm') {
+                var OfficeApplyNum = $('#OfficeApplyNum')
+                console.log(OfficeApplyNum.val())
+                if (!/^[0-9]+$/.test(OfficeApplyNum.val())) {
+                    OfficeApplyNum.addClass('border-red-400')
+                    OfficeApplyNum.blur(function (event) {
+                        $(event.target).removeClass('border-red-400')
+                    })
+                    result = false
+                }
+
+                var OfficeApplyDate = $('#OfficeApplyDate')
+                if (OfficeApplyDate.val() === '' || isNaN(new Date(OfficeApplyDate.val()).getDate())) {
+                    OfficeApplyDate.addClass('border-red-400')
+                    OfficeApplyDate.blur(function (event) {
+                        $(event.target).removeClass('border-red-400')
+                    })
+                    result = false
+                }
+            }
+            else
+                result = false
+
+            return result
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            $('#SearchEmpolyName').val(searchParams.SearchEmpolyName)
+            $('input[name="SearchOfficeApplyState"]').get().forEach(item => {
+                if (item.value === searchParams.SearchOfficeApplyState)
+                    $(item).next('.layui-form-radio').trigger('click')
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchEmpolyName = $('#SearchEmpolyName').val()
+            searchParams.SearchOfficeApplyState = $('input[name="SearchOfficeApplyState"]:checked').val()
+            table.reload('dataTable', {
+                url: '/OfficeSuppliesRecordInfo/GetOfficeSuppliesRecordInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchEmpolyName: searchParams.SearchEmpolyName,
+                    SearchOfficeApplyState: searchParams.SearchOfficeApplyState
+                },
+            }, true);
+        }
+
+        function applyClick() {
+            layer.open({
+                type: 1,
+                title: '申请办公用品',
+                area: ['600px', '300px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ApplyForm').html()
+            });
+            $('#applyButton').click(applyButtonClick)
+            $('#OfficeApplyDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '审批申请',
+                area: ['600px', '300px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#UpdateForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $.ajax({
+                url: '/OfficeSuppliesRecordInfo/GetAssetCount',
+                method: 'get',
+                data: {
+                    id: rowData.AssetID
+                },
+                success: (data) => {
+                    if (data.code === 0)
+                        $('#AssetCount').val(data.count)
+                    else {
+                        layer.alert('获取库存数量失败, 请刷新页面', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+            $('#OfficeID').val(rowData.OfficeID)
+            $('#updateButton').click(updateButtonClick)
+            $('#OfficeReceiveDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function applyButtonClick() {
+            if (!validateFormat('ApplyForm'))
+                return false
+
+            $.ajax({
+                url: '/OfficeSuppliesRecordInfo/Apply',
+                method: 'post',
+                data: {
+                    AssetID: $('#AssetID').val(),
+                    OfficeApplyNum: $('#OfficeApplyNum').val(),
+                    OfficeApplyDate: $('#OfficeApplyDate').val()
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('申请成功', {
+                            title: '提示',
+                            icon: 1
+                        }, index => {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+                        layer.closeAll('page')
+                    }
+                    else {
+                        layer.alert('申请失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+
+        function updateButtonClick() {
+            if (!validateFormat('UpdateForm'))
+                return false
+
+            $.ajax({
+                url: '/OfficeSuppliesRecordInfo/Update',
+                method: 'post',
+                data: {
+                    OfficeID: $('#OfficeID').val(),
+                    OfficeReceiveNum: $('#OfficeReceiveNum').val(),
+                    OfficeReceiveDate: $('#OfficeReceiveDate').val()                
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('审批成功', {
+                            title: '提示',
+                            icon: 1
+                        }, index => {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+                        layer.closeAll('page')
+                    }
+                    else {
+                        layer.alert('审批失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

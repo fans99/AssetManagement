@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="cb04ebe3b71d45bfac98cca919a6db9d" Name="Diagram1">
+        <EntityTypeShape EntityType="AssetDBModel.AreaInfo" Width="1.5" PointX="3" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AreaTypeInfo" Width="1.5" PointX="0.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AssetDetailInfo" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AssetDetailRecordInfo" Width="1.5" PointX="5.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AssetInfo" Width="1.5" PointX="3" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AssetPutInfo" Width="1.5" PointX="5.25" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.AssetTypeInfo" Width="1.5" PointX="0.75" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.CampusInfo" Width="1.5" PointX="7.75" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.DamageRecordInfo" Width="1.5" PointX="7.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.DeptInfo" Width="1.5" PointX="10" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.EmpolyInfo" Width="1.5" PointX="12.25" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.OfficeSuppliesRecordInfo" Width="1.5" PointX="9.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AssetDBModel.RoleInfo" Width="1.5" PointX="10" PointY="6" IsExpanded="true" />
+        <AssociationConnector Association="AssetDBModel.FK__AreaInfo__AreaTy__267ABA7A" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__AssetDeta__Asset__2E1BDC42" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__AssetInfo__Asset__2B3F6F97" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__AssetPutI__Asset__3D5E1FD2" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__DeptInfo__Campus__34C8D9D1" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__EmpolyInf__DeptI__398D8EEE" ManuallyRouted="false" />
+        <AssociationConnector Association="AssetDBModel.FK__EmpolyInf__RoleI__3A81B327" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,106 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>添加</title>
+    <link rel="stylesheet" href="~/lib/layui/css/layui.min.css" />
+    <link rel="stylesheet" href="~/lib/tailwindcss/tailwind.css" />
+</head>
+<body>
+    <form class="layui-form pt-8 pr-8" method="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">校区名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="CampusName" autocomplete="off" onblur="existAction()" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">校区说明</label>
+            <div class="layui-input-block">
+                <input type="text" id="CampusReMark" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="flex items-center float-right fixed bottom-8 right-8">
+            <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+            <button type="button" class="layui-btn layui-btn-normal" onclick="submitClick()">添加</button>
+        </div>
+        <div class="clear-both"></div>
+    </form>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/layui/layui.min.js"></script>
+    <script>
+        function existAction() {
+            $.get({
+                url: '/CampusInfo/Exist',
+                data: {
+                    CampusName: document.getElementById('CampusName').value
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.msg('校区已存在')
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+        function closeClick() {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.style(index, {
+                display: 'none'
+            });
+            parent.layer.close(index);
+        }
+
+        function submitClick() {
+            $.get({
+                url: '/CampusInfo/Exist',
+                data: {
+                    CampusName: document.getElementById('CampusName').value
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.msg('校区已存在')
+                    }
+                    else {
+                        $.post({
+                            url: '/CampusInfo/Create',
+                            data: {
+                                CampusName: document.getElementById('CampusName').value,
+                                CampusReMark: document.getElementById('CampusReMark').value
+                            },
+                            success: function (_data) {
+                                if (_data.code === 0) {
+                                    parent.layer.alert('添加成功', {
+                                        title: '提示',
+                                        icon: 1
+                                    })
+                                    parent.refresh()
+                                    closeClick()
+                                }
+                                else {
+                                    parent.layer.alert('添加失败', {
+                                        title: '提示',
+                                        icon: 2
+                                    })
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+
+        }
+    </script>
+</body>
+</html>

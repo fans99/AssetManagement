@@ -1,0 +1,463 @@
+﻿@model AssetManagement.ViewModels.DamageRecordInfoIndexViewModel
+@{
+    Page.Title = "固定资产报损维修";
+    Page.ActiveIndex = 3;
+    Page.SubIndex = 2;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script id="ApplyForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">明细资产:</label>
+                <div class="layui-input-block">
+                    <select id="AssetDetailID" class="w-full h-14 pl-3 border cursor-pointer">
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">损坏日期:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="DamageDate" autocomplete="off" class="layui-input" placeholder="请选择损坏日期" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">损坏原因:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="DamageCauses" autocomplete="off" class="layui-input" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">问题描述:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="ProblemDescription" autocomplete="off" class="layui-input" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">图片描述:</label>
+                <div class="layui-input-block">
+                    <div id="imgBox" class="w-full h-80 mt-5 mb-5 border border-solid bg-no-repeat bg-contain bg-center" style="background-image: url('/Content/img/default-img.png')" />
+                    <button type="button" class="layui-btn block" id="uploadButton">
+                        <i class="layui-icon">&#xe67c;</i>点击上传图片
+                    </button>
+                    <input type="hidden" id="Problemlmange" value="" />
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal">报修</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script id="DetailForm" type="text/html">
+        <div class="pt-8 px-8 relative h-full">
+            <div class="w-full flex mb-6">
+                <span>资产名称:</span>
+                <div id="AssetName" class="ml-4"></div>
+            </div>
+
+            <div class="w-full flex mb-6">
+                <span>图片描述:</span>
+                <div id="Problemlmange" class="flex-1 h-80 my-5 ml-4 border border-solid bg-no-repeat bg-contain bg-center"></div>
+            </div>
+
+            <div class="w-full flex mb-6">
+                <span>损坏原因:</span>
+                <div id="DamageCauses" class="ml-4"></div>
+            </div>
+
+            <div class="w-full flex mb-6">
+                <span>问题描述:</span>
+                <div id="ProblemDescription" class="ml-4"></div>
+            </div>
+
+            <div class="w-full grid grid-cols-2 grid-rows-4 gap-y-6">
+                <div class="col-span-1 row-span-1 flex">
+                    <span>申报人:</span>
+                    <div id="EmpolyName" class="ml-4"></div>
+                </div>
+
+                <div class="col-span-1 row-span-1 flex">
+                    <span>申报时间:</span>
+                    <div id="DamageDate" class="ml-4"></div>
+                </div>
+
+                <div class="col-span-1 row-span-1 flex">
+                    <span>维修人:</span>
+                    <div id="Repairman" class="ml-4"></div>
+                </div>
+
+                <div class="col-span-1 row-span-1 flex">
+                    <span>维修日期:</span>
+                    <div id="RepairDates" class="ml-4"></div>
+                </div>
+
+                <div class="col-span-1 row-span-1 flex">
+                    <span>维修状态:</span>
+                    <div id="RecordState" class="ml-4"></div>
+                </div>
+
+                <div class="col-span-1 row-span-1 flex">
+                    <span>备注:</span>
+                    <div id="DamageRecordReMark" class="ml-4"></div>
+                </div>
+            </div>
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+            </div>
+            <div class="clear-both"></div>
+        </div>       
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <span>资产名称:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>状态:</span>
+                <div class="layui-input-inline">
+                    <input type="radio" class="text-blue-400" name="SearchRecordState" value="0" title="申报中" />
+                    <input type="radio" class="text-blue-400" name="SearchRecordState" value="1" title="已处理" />
+                    <input type="radio" class="text-blue-400" name="SearchRecordState" value="" title="全部" checked />
+                </div>
+            </div>
+
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button class="layui-btn layui-btn-sm" onclick="applyClick()">申报维修</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+</table>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchRecordState: ''
+        }
+        var table = layui.table
+        var upload = layui.upload
+        table.render({
+            elem: '#dataTable',
+            url: '/DamageRecordInfo/GetDamageRecordInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'DamageRecordlID',
+                    width: 100
+                },
+                {
+                    title: '资产名称',
+                    field: 'AssetName',
+                },
+                {
+                    title: '申请人',
+                    field: 'EmpolyName',
+                },
+                {
+                    title: '损坏时间',
+                    field: 'DamageDate',
+                },
+                {
+                    title: '损坏原因',
+                    field: 'DamageCauses',
+                },
+                {
+                    title: '问题描述',
+                    field: 'ProblemDescription',
+                },
+                {
+                    title: '维修状态',
+                    field: 'RecordState',
+                    templet: function (d) {
+                        if (d.RecordState === 0)
+                            return '<span class="text-red-400">申报中</span>'
+                        else if (d.RecordState === 1)
+                            return '<span class="text-green-400">已维修</span>'
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'DamageRecordReMark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 130,
+                    templet: function (d) {
+                        if (d.RecordState === 0)
+                            return `<div>
+                                        <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="detailClick(${d.LAY_TABLE_INDEX})">详情</button>
+                                        @if (Model.IsAdmin) {
+                                         <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="updateClick(${d.LAY_TABLE_INDEX})">维修</button>
+                                        }
+                                    </div>`
+                        else
+                            return `<div>
+                                        <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="detailClick(${d.LAY_TABLE_INDEX})">详情</button>
+                                        @if (Model.IsAdmin){
+                                        <span class="text-red-400">已维修</span>
+                                        }
+                                    </div>`
+                    }
+                },
+            ]]
+        });            
+
+        function validateFormat() {
+            var result = true
+            var ProblemDescription = $('#ProblemDescription')
+            if (ProblemDescription.val() === '') {
+                ProblemDescription.addClass('border-red-400')
+                ProblemDescription.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var DamageDate = $('#DamageDate')
+            if (DamageDate.val() === '' || isNaN(new Date(DamageDate.val()).getDate())) {
+                DamageDate.addClass('border-red-400')
+                DamageDate.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var Problemlmange = $('#Problemlmange')
+            if (Problemlmange.val() === '') {
+                layer.msg('请选择图片')
+                result = false
+            }
+
+            return result
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            $('input[name="SearchRecordState"]').get().forEach(item => {
+                if (item.value === searchParams.SearchRecordState)
+                    $(item).next('.layui-form-radio').trigger('click')
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchRecordState = $('input[name="SearchRecordState"]:checked').val()
+            table.reload('dataTable', {
+                url: '/OfficeSuppliesRecordInfo/GetOfficeSuppliesRecordInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchRecordState: searchParams.SearchRecordState,
+                },
+            }, true);
+        }
+
+        function updateClick(index) {
+            if (confirm('确定要维修吗？')) {
+                $.ajax({
+                    url: '/DamageRecordInfo/Repair',
+                    method: 'post',
+                    data: {
+                        id: table.getData('dataTable')[index].DamageRecordlID
+                    },
+                    success: (data) => {
+                        if (data.code === 0) {
+                            layer.alert('维修成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('维修失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+        }
+
+        function applyClick() {
+            layer.open({
+                type: 1,
+                title: '申报维修',
+                area: ['600px', '700px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ApplyForm').html()
+            });
+            upload.render({
+                elem: '#uploadButton',
+                url: '/DamageRecordInfo/UploadImg',
+                accept: 'images',
+                acceptMime: 'image/*',
+                field: 'ImgFile',
+                choose: function (obj) {
+                    obj.preview(function (index, file, result) {
+                        $('#imgBox').css({
+                            "backgroundImage": `url('${result}')`
+                        })
+                    })
+                },
+                done: function (res, index, upload) {
+                    if (res.code != 0) {
+                        layer.alert('图片上传失败')
+                    }
+                    else {
+                        $('#Problemlmange').val(res.result)
+                    }
+                }
+            })
+            $.ajax({
+                url: '/DamageRecordInfo/GetUsedAssetInfos',
+                method: 'get',
+                success: (res) => {
+                    if (res.code === 0) {
+                        var AssetDetailID = $('#AssetDetailID')
+                        AssetDetailID.empty()
+
+                        if (res.data.length > 0) {
+                            AssetDetailID.removeAttr('disabled')
+                            $('#applyButton').removeAttr('disabled')
+                            res.data.forEach(item => {
+                                AssetDetailID.append(`<option value="${item.AssetDetailID}">${item.AssetName}</option>`)
+                            })
+                        }
+                        else {
+                            AssetDetailID.append(`<option selected>你没有可以报修的资产</option>`)
+                            AssetDetailID.attr('disabled', 'disabled')
+                            $('#applyButton').attr('disabled', 'disabled')
+                        }
+                    }
+                },
+                error: (err) => {
+                    layer.msg('获取明细资产信息失败')
+                }
+            })
+            $('#submitButton').click(submitClick)
+            $('#DamageDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function detailClick(index) {
+            layer.open({
+                type: 1,
+                title: '查看详情',
+                area: ['600px', '600px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#DetailForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $('#AssetName').html(rowData.AssetName)
+            $('#Problemlmange').css({
+                "backgroundImage" : `url('/Content/upload/damage/${rowData.Problemlmange}')`
+            })
+            $('#DamageCauses').html(rowData.DamageCauses)
+            $('#ProblemDescription').html(rowData.ProblemDescription)
+            $('#EmpolyName').html(rowData.EmpolyName)
+            $('#DamageDate').html(`<span class="leading-normal">${rowData.DamageDate}</span>`)
+            $('#Repairman').html((function () {
+                console.log(rowData)
+                return rowData.Repairman === null ? '待处理' : rowData.Repairman
+            })())
+            $('#RepairDates').html((function() {
+                return rowData.RepairDates === '' ? '待处理' : `<span class="leading-normal">${rowData.RepairDates}</span>`
+            })())
+            if (rowData.RecordState === 0)
+                $('#RecordState').html('<span class="text-red-400">申报中</span>')
+            else
+                $('#RecordState').html('<span class="text-green-400">已维修</span>')
+            $('#DamageRecordReMark').html(rowData.DamageRecordReMark)
+            $('#OfficeReceiveDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }
+
+        function submitClick() {
+            if (!validateFormat())
+                return false
+
+            $.ajax({
+                url: '/DamageRecordInfo/Create',
+                method: 'post',
+                data: {
+                    AssetDetailID: $('#AssetDetailID').val(),
+                    DamageDate: $('#DamageDate').val(),
+                    DamageCauses: $('#DamageCauses').val(),
+                    ProblemDescription: $('#ProblemDescription').val(),
+                    Problemlmange: $('#Problemlmange').val()
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('申报成功', {
+                            title: '提示',
+                            icon: 1
+                        }, index => {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+                        layer.closeAll('page')
+                    }
+                    else {
+                        layer.alert('申报失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+        
+    </script>
+}

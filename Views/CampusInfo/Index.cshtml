@@ -1,0 +1,128 @@
+﻿@model AssetManagement.ViewModels.CampusInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "校区管理";
+    Page.ActiveIndex = 0;
+    Page.SubIndex = 0;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section head{
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>校区名称:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="@Model.SearchName">
+                </div>
+            </div>
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+    <thead>
+        <tr>
+            <th lay-data="{field: 'CampusID', width: 100}">校区编号</th>
+            <th lay-data="{field: 'CampusName'}">校区名称</th>
+            <th lay-data="{field: 'CampusReMark'}">校区描述</th>
+            <th lay-data="{field: 'option', width: 100}">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (CampusInfo item in Model.CampusInfoList)
+        {
+            <tr>
+                <td>@item.CampusID</td>
+                <td>@item.CampusName</td>
+                <td>@item.CampusReMark</td>
+                <td><button class="layui-btn layui-btn-xs layui-btn-warm" onclick="removeClick(@item.CampusID)">删除</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var table = layui.table;
+
+        //转换静态表格
+        table.init('demo', {
+            toolbar: '#toolbar',
+            //page: true,
+            //limit: 5,
+            //limits: [5, 10 ,20]
+        });
+
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            //执行一个laypage实例
+            laypage.render({
+                elem: 'paging',
+                count: @Model.RowCount,
+                limit: 5,
+                limits: [5, 10, 15, 20],
+                curr: @(Model.Page??1),
+                layout: ['prev', 'page', 'next', 'skip', 'limit'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        var name = document.getElementById('SearchName').value
+                        window.location = `/CampusInfo/Index?SearchName=${name}&page=${obj.curr}&limit=${obj.limit}`
+                    }
+                }
+            })
+        })
+
+        function refresh() {
+            setTimeout(() => {
+                window.location.reload()
+            }, 1000)
+        }
+
+        function searchClick() {
+            var name = document.getElementById('SearchName').value
+            window.location = `/CampusInfo/Index?SearchName=${name}`
+        }
+
+        function createClick() {
+            layer.open({
+                type: 2,
+                title: '添加校区',
+                area: ['600px', '280px'],
+                fixed: true, //不固定
+                maxmin: false,
+                content: '/CampusInfo/Create'
+            });
+        }
+
+        function removeClick(id) {
+            $.ajax({
+                url: '/CampusInfo/Delete',
+                method: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('删除成功', {
+                            title: '提示',
+                            icon: 1
+                        }, function () {
+                            window.location.reload()
+                        })
+
+                    }
+                    else {
+                        layer.alert('删除失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

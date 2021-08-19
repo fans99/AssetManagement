@@ -1,0 +1,770 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="AssetDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AreaInfo">
+          <Key>
+            <PropertyRef Name="AreaID" />
+          </Key>
+          <Property Name="AreaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AreaTypeID" Type="int" Nullable="false" />
+          <Property Name="AreaName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AreaReMark" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AreaTypeInfo">
+          <Key>
+            <PropertyRef Name="AreaTypeID" />
+          </Key>
+          <Property Name="AreaTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AreaTypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AreaTypeMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AssetDetailInfo">
+          <Key>
+            <PropertyRef Name="AssetDetailID" />
+          </Key>
+          <Property Name="AssetDetailID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetID" Type="int" Nullable="false" />
+          <Property Name="AssetDetailNum" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="AssetDetailUseState" Type="int" Nullable="false" />
+          <Property Name="AssetDetailUseDate" Type="datetime" />
+          <Property Name="AssetDetailReturnDate" Type="datetime" />
+          <Property Name="AssetDetailServiceState" Type="int" Nullable="false" />
+          <Property Name="AssetDetailDumState" Type="int" Nullable="false" />
+          <Property Name="EmpolyID" Type="int" Nullable="false" />
+          <Property Name="AreaID" Type="int" Nullable="false" />
+          <Property Name="AssetAreaReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AssetDetailRecordInfo">
+          <Key>
+            <PropertyRef Name="AssetDetailRecordID" />
+          </Key>
+          <Property Name="AssetDetailRecordID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetDetailID" Type="int" Nullable="false" />
+          <Property Name="EmpolyID" Type="int" Nullable="false" />
+          <Property Name="AreaID" Type="int" Nullable="false" />
+          <Property Name="AssetNum" Type="int" Nullable="false" />
+          <Property Name="AssetDetailRecordUseDate" Type="datetime" Nullable="false" />
+          <Property Name="AssetDetailRecordReturnDate" Type="datetime" />
+          <Property Name="AssetDetailRecordReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AssetInfo">
+          <Key>
+            <PropertyRef Name="AssetID" />
+          </Key>
+          <Property Name="AssetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetTypeID" Type="int" Nullable="false" />
+          <Property Name="AssetName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AssetModel" Type="nvarchar" MaxLength="20" />
+          <Property Name="AssetCompany" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AssetReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AssetPutInfo">
+          <Key>
+            <PropertyRef Name="AssetPutID" />
+          </Key>
+          <Property Name="AssetPutID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetID" Type="int" />
+          <Property Name="AssetPutCount" Type="int" Nullable="false" />
+          <Property Name="AssetPutDate" Type="datetime" Nullable="false" />
+          <Property Name="EmpolyID" Type="int" />
+          <Property Name="AssetPutReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="AssetTypeInfo">
+          <Key>
+            <PropertyRef Name="AssetTypeID" />
+          </Key>
+          <Property Name="AssetTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetTypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AssetTypeReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="CampusInfo">
+          <Key>
+            <PropertyRef Name="CampusID" />
+          </Key>
+          <Property Name="CampusID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CampusName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="CampusReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="DamageRecordInfo">
+          <Key>
+            <PropertyRef Name="DamageRecordlID" />
+          </Key>
+          <Property Name="DamageRecordlID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetDetailID" Type="int" Nullable="false" />
+          <Property Name="EmpolyID" Type="int" />
+          <Property Name="DamageDate" Type="datetime" Nullable="false" />
+          <Property Name="DamageCauses" Type="nvarchar" MaxLength="50" />
+          <Property Name="ProblemDescription" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Problemlmange" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="RecordState" Type="int" Nullable="false" />
+          <Property Name="Repairman" Type="nvarchar" MaxLength="50" />
+          <Property Name="RepairDates" Type="datetime" />
+          <Property Name="DamageRecordReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="DeptInfo">
+          <Key>
+            <PropertyRef Name="DeptID" />
+          </Key>
+          <Property Name="DeptID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CampusID" Type="int" />
+          <Property Name="DeptName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DeptReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="EmpolyInfo">
+          <Key>
+            <PropertyRef Name="EmpolyID" />
+          </Key>
+          <Property Name="EmpolyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmpolyNum" Type="char" MaxLength="6" Nullable="false" />
+          <Property Name="EmpolyPwd" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="EmpolyName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="EmpolySex" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="EmpolyldCard" Type="char" MaxLength="18" Nullable="false" />
+          <Property Name="Empolylmg" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DeptID" Type="int" />
+          <Property Name="EmpolyLevel" Type="int" Nullable="false" />
+          <Property Name="RoleID" Type="int" Nullable="false" />
+          <Property Name="InductionDate" Type="datetime" />
+          <Property Name="DepartureDate" Type="datetime" />
+          <Property Name="EmpolyReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="OfficeSuppliesRecordInfo">
+          <Key>
+            <PropertyRef Name="OfficeID" />
+          </Key>
+          <Property Name="OfficeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AssetID" Type="int" Nullable="false" />
+          <Property Name="OfficeApplylD" Type="int" Nullable="false" />
+          <Property Name="OfficeApplyNum" Type="int" Nullable="false" />
+          <Property Name="OfficeApplyState" Type="int" Nullable="false" />
+          <Property Name="OfficeApplyDate" Type="datetime" Nullable="false" />
+          <Property Name="OfficeReceiveNum" Type="int" />
+          <Property Name="OfficeReceiveDate" Type="datetime" />
+          <Property Name="OfficeRemark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="RoleInfo">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="RoleReMark" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <Association Name="FK__AreaInfo__AreaTy__267ABA7A">
+          <End Role="AreaTypeInfo" Type="Self.AreaTypeInfo" Multiplicity="1" />
+          <End Role="AreaInfo" Type="Self.AreaInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AreaTypeInfo">
+              <PropertyRef Name="AreaTypeID" />
+            </Principal>
+            <Dependent Role="AreaInfo">
+              <PropertyRef Name="AreaTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetDeta__Asset__2E1BDC42">
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="1" />
+          <End Role="AssetDetailInfo" Type="Self.AssetDetailInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetInfo">
+              <PropertyRef Name="AssetID" />
+            </Principal>
+            <Dependent Role="AssetDetailInfo">
+              <PropertyRef Name="AssetID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetInfo__Asset__2B3F6F97">
+          <End Role="AssetTypeInfo" Type="Self.AssetTypeInfo" Multiplicity="1" />
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetTypeInfo">
+              <PropertyRef Name="AssetTypeID" />
+            </Principal>
+            <Dependent Role="AssetInfo">
+              <PropertyRef Name="AssetTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetPutI__Asset__3D5E1FD2">
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="0..1" />
+          <End Role="AssetPutInfo" Type="Self.AssetPutInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetInfo">
+              <PropertyRef Name="AssetID" />
+            </Principal>
+            <Dependent Role="AssetPutInfo">
+              <PropertyRef Name="AssetID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DeptInfo__Campus__34C8D9D1">
+          <End Role="CampusInfo" Type="Self.CampusInfo" Multiplicity="0..1" />
+          <End Role="DeptInfo" Type="Self.DeptInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CampusInfo">
+              <PropertyRef Name="CampusID" />
+            </Principal>
+            <Dependent Role="DeptInfo">
+              <PropertyRef Name="CampusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__EmpolyInf__DeptI__398D8EEE">
+          <End Role="DeptInfo" Type="Self.DeptInfo" Multiplicity="0..1" />
+          <End Role="EmpolyInfo" Type="Self.EmpolyInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DeptInfo">
+              <PropertyRef Name="DeptID" />
+            </Principal>
+            <Dependent Role="EmpolyInfo">
+              <PropertyRef Name="DeptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__EmpolyInf__RoleI__3A81B327">
+          <End Role="RoleInfo" Type="Self.RoleInfo" Multiplicity="1" />
+          <End Role="EmpolyInfo" Type="Self.EmpolyInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RoleInfo">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="EmpolyInfo">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AssetDBModelStoreContainer">
+          <EntitySet Name="AreaInfo" EntityType="Self.AreaInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AreaTypeInfo" EntityType="Self.AreaTypeInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssetDetailInfo" EntityType="Self.AssetDetailInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssetDetailRecordInfo" EntityType="Self.AssetDetailRecordInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssetInfo" EntityType="Self.AssetInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssetPutInfo" EntityType="Self.AssetPutInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssetTypeInfo" EntityType="Self.AssetTypeInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CampusInfo" EntityType="Self.CampusInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DamageRecordInfo" EntityType="Self.DamageRecordInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DeptInfo" EntityType="Self.DeptInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmpolyInfo" EntityType="Self.EmpolyInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OfficeSuppliesRecordInfo" EntityType="Self.OfficeSuppliesRecordInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RoleInfo" EntityType="Self.RoleInfo" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__AreaInfo__AreaTy__267ABA7A" Association="Self.FK__AreaInfo__AreaTy__267ABA7A">
+            <End Role="AreaTypeInfo" EntitySet="AreaTypeInfo" />
+            <End Role="AreaInfo" EntitySet="AreaInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetDeta__Asset__2E1BDC42" Association="Self.FK__AssetDeta__Asset__2E1BDC42">
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+            <End Role="AssetDetailInfo" EntitySet="AssetDetailInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetInfo__Asset__2B3F6F97" Association="Self.FK__AssetInfo__Asset__2B3F6F97">
+            <End Role="AssetTypeInfo" EntitySet="AssetTypeInfo" />
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetPutI__Asset__3D5E1FD2" Association="Self.FK__AssetPutI__Asset__3D5E1FD2">
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+            <End Role="AssetPutInfo" EntitySet="AssetPutInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DeptInfo__Campus__34C8D9D1" Association="Self.FK__DeptInfo__Campus__34C8D9D1">
+            <End Role="CampusInfo" EntitySet="CampusInfo" />
+            <End Role="DeptInfo" EntitySet="DeptInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__EmpolyInf__DeptI__398D8EEE" Association="Self.FK__EmpolyInf__DeptI__398D8EEE">
+            <End Role="DeptInfo" EntitySet="DeptInfo" />
+            <End Role="EmpolyInfo" EntitySet="EmpolyInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__EmpolyInf__RoleI__3A81B327" Association="Self.FK__EmpolyInf__RoleI__3A81B327">
+            <End Role="RoleInfo" EntitySet="RoleInfo" />
+            <End Role="EmpolyInfo" EntitySet="EmpolyInfo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AssetDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AreaInfo">
+          <Key>
+            <PropertyRef Name="AreaID" />
+          </Key>
+          <Property Name="AreaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AreaTypeID" Type="Int32" Nullable="false" />
+          <Property Name="AreaName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AreaReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="AreaTypeInfo" Relationship="Self.FK__AreaInfo__AreaTy__267ABA7A" FromRole="AreaInfo" ToRole="AreaTypeInfo" />
+        </EntityType>
+        <EntityType Name="AreaTypeInfo">
+          <Key>
+            <PropertyRef Name="AreaTypeID" />
+          </Key>
+          <Property Name="AreaTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AreaTypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AreaTypeMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AreaInfo" Relationship="Self.FK__AreaInfo__AreaTy__267ABA7A" FromRole="AreaTypeInfo" ToRole="AreaInfo" />
+        </EntityType>
+        <EntityType Name="AssetDetailInfo">
+          <Key>
+            <PropertyRef Name="AssetDetailID" />
+          </Key>
+          <Property Name="AssetDetailID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetID" Type="Int32" Nullable="false" />
+          <Property Name="AssetDetailNum" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="AssetDetailUseState" Type="Int32" Nullable="false" />
+          <Property Name="AssetDetailUseDate" Type="DateTime" Precision="3" />
+          <Property Name="AssetDetailReturnDate" Type="DateTime" Precision="3" />
+          <Property Name="AssetDetailServiceState" Type="Int32" Nullable="false" />
+          <Property Name="AssetDetailDumState" Type="Int32" Nullable="false" />
+          <Property Name="EmpolyID" Type="Int32" Nullable="false" />
+          <Property Name="AreaID" Type="Int32" Nullable="false" />
+          <Property Name="AssetAreaReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AssetInfo" Relationship="Self.FK__AssetDeta__Asset__2E1BDC42" FromRole="AssetDetailInfo" ToRole="AssetInfo" />
+        </EntityType>
+        <EntityType Name="AssetDetailRecordInfo">
+          <Key>
+            <PropertyRef Name="AssetDetailRecordID" />
+          </Key>
+          <Property Name="AssetDetailRecordID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetDetailID" Type="Int32" Nullable="false" />
+          <Property Name="EmpolyID" Type="Int32" Nullable="false" />
+          <Property Name="AreaID" Type="Int32" Nullable="false" />
+          <Property Name="AssetNum" Type="Int32" Nullable="false" />
+          <Property Name="AssetDetailRecordUseDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="AssetDetailRecordReturnDate" Type="DateTime" Precision="3" />
+          <Property Name="AssetDetailRecordReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="AssetInfo">
+          <Key>
+            <PropertyRef Name="AssetID" />
+          </Key>
+          <Property Name="AssetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetTypeID" Type="Int32" Nullable="false" />
+          <Property Name="AssetName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AssetModel" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="AssetCompany" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AssetReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AssetDetailInfo" Relationship="Self.FK__AssetDeta__Asset__2E1BDC42" FromRole="AssetInfo" ToRole="AssetDetailInfo" />
+          <NavigationProperty Name="AssetTypeInfo" Relationship="Self.FK__AssetInfo__Asset__2B3F6F97" FromRole="AssetInfo" ToRole="AssetTypeInfo" />
+          <NavigationProperty Name="AssetPutInfo" Relationship="Self.FK__AssetPutI__Asset__3D5E1FD2" FromRole="AssetInfo" ToRole="AssetPutInfo" />
+        </EntityType>
+        <EntityType Name="AssetPutInfo">
+          <Key>
+            <PropertyRef Name="AssetPutID" />
+          </Key>
+          <Property Name="AssetPutID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetID" Type="Int32" />
+          <Property Name="AssetPutCount" Type="Int32" Nullable="false" />
+          <Property Name="AssetPutDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EmpolyID" Type="Int32" />
+          <Property Name="AssetPutReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AssetInfo" Relationship="Self.FK__AssetPutI__Asset__3D5E1FD2" FromRole="AssetPutInfo" ToRole="AssetInfo" />
+        </EntityType>
+        <EntityType Name="AssetTypeInfo">
+          <Key>
+            <PropertyRef Name="AssetTypeID" />
+          </Key>
+          <Property Name="AssetTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetTypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AssetTypeReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AssetInfo" Relationship="Self.FK__AssetInfo__Asset__2B3F6F97" FromRole="AssetTypeInfo" ToRole="AssetInfo" />
+        </EntityType>
+        <EntityType Name="CampusInfo">
+          <Key>
+            <PropertyRef Name="CampusID" />
+          </Key>
+          <Property Name="CampusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CampusName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CampusReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="DeptInfo" Relationship="Self.FK__DeptInfo__Campus__34C8D9D1" FromRole="CampusInfo" ToRole="DeptInfo" />
+        </EntityType>
+        <EntityType Name="DamageRecordInfo">
+          <Key>
+            <PropertyRef Name="DamageRecordlID" />
+          </Key>
+          <Property Name="DamageRecordlID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetDetailID" Type="Int32" Nullable="false" />
+          <Property Name="EmpolyID" Type="Int32" />
+          <Property Name="DamageDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DamageCauses" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ProblemDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Problemlmange" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RecordState" Type="Int32" Nullable="false" />
+          <Property Name="Repairman" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RepairDates" Type="DateTime" Precision="3" />
+          <Property Name="DamageRecordReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="DeptInfo">
+          <Key>
+            <PropertyRef Name="DeptID" />
+          </Key>
+          <Property Name="DeptID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CampusID" Type="Int32" />
+          <Property Name="DeptName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DeptReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="CampusInfo" Relationship="Self.FK__DeptInfo__Campus__34C8D9D1" FromRole="DeptInfo" ToRole="CampusInfo" />
+          <NavigationProperty Name="EmpolyInfo" Relationship="Self.FK__EmpolyInf__DeptI__398D8EEE" FromRole="DeptInfo" ToRole="EmpolyInfo" />
+        </EntityType>
+        <EntityType Name="EmpolyInfo">
+          <Key>
+            <PropertyRef Name="EmpolyID" />
+          </Key>
+          <Property Name="EmpolyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmpolyNum" Type="String" MaxLength="6" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="EmpolyPwd" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EmpolyName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EmpolySex" Type="String" MaxLength="2" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="EmpolyldCard" Type="String" MaxLength="18" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Empolylmg" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DeptID" Type="Int32" />
+          <Property Name="EmpolyLevel" Type="Int32" Nullable="false" />
+          <Property Name="RoleID" Type="Int32" Nullable="false" />
+          <Property Name="InductionDate" Type="DateTime" Precision="3" />
+          <Property Name="DepartureDate" Type="DateTime" Precision="3" />
+          <Property Name="EmpolyReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="DeptInfo" Relationship="Self.FK__EmpolyInf__DeptI__398D8EEE" FromRole="EmpolyInfo" ToRole="DeptInfo" />
+          <NavigationProperty Name="RoleInfo" Relationship="Self.FK__EmpolyInf__RoleI__3A81B327" FromRole="EmpolyInfo" ToRole="RoleInfo" />
+        </EntityType>
+        <EntityType Name="OfficeSuppliesRecordInfo">
+          <Key>
+            <PropertyRef Name="OfficeID" />
+          </Key>
+          <Property Name="OfficeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AssetID" Type="Int32" Nullable="false" />
+          <Property Name="OfficeApplylD" Type="Int32" Nullable="false" />
+          <Property Name="OfficeApplyNum" Type="Int32" Nullable="false" />
+          <Property Name="OfficeApplyState" Type="Int32" Nullable="false" />
+          <Property Name="OfficeApplyDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="OfficeReceiveNum" Type="Int32" />
+          <Property Name="OfficeReceiveDate" Type="DateTime" Precision="3" />
+          <Property Name="OfficeRemark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RoleInfo">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RoleReMark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="EmpolyInfo" Relationship="Self.FK__EmpolyInf__RoleI__3A81B327" FromRole="RoleInfo" ToRole="EmpolyInfo" />
+        </EntityType>
+        <Association Name="FK__AreaInfo__AreaTy__267ABA7A">
+          <End Role="AreaTypeInfo" Type="Self.AreaTypeInfo" Multiplicity="1" />
+          <End Role="AreaInfo" Type="Self.AreaInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AreaTypeInfo">
+              <PropertyRef Name="AreaTypeID" />
+            </Principal>
+            <Dependent Role="AreaInfo">
+              <PropertyRef Name="AreaTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetDeta__Asset__2E1BDC42">
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="1" />
+          <End Role="AssetDetailInfo" Type="Self.AssetDetailInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetInfo">
+              <PropertyRef Name="AssetID" />
+            </Principal>
+            <Dependent Role="AssetDetailInfo">
+              <PropertyRef Name="AssetID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetInfo__Asset__2B3F6F97">
+          <End Role="AssetTypeInfo" Type="Self.AssetTypeInfo" Multiplicity="1" />
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetTypeInfo">
+              <PropertyRef Name="AssetTypeID" />
+            </Principal>
+            <Dependent Role="AssetInfo">
+              <PropertyRef Name="AssetTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__AssetPutI__Asset__3D5E1FD2">
+          <End Role="AssetInfo" Type="Self.AssetInfo" Multiplicity="0..1" />
+          <End Role="AssetPutInfo" Type="Self.AssetPutInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AssetInfo">
+              <PropertyRef Name="AssetID" />
+            </Principal>
+            <Dependent Role="AssetPutInfo">
+              <PropertyRef Name="AssetID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DeptInfo__Campus__34C8D9D1">
+          <End Role="CampusInfo" Type="Self.CampusInfo" Multiplicity="0..1" />
+          <End Role="DeptInfo" Type="Self.DeptInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CampusInfo">
+              <PropertyRef Name="CampusID" />
+            </Principal>
+            <Dependent Role="DeptInfo">
+              <PropertyRef Name="CampusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__EmpolyInf__DeptI__398D8EEE">
+          <End Role="DeptInfo" Type="Self.DeptInfo" Multiplicity="0..1" />
+          <End Role="EmpolyInfo" Type="Self.EmpolyInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DeptInfo">
+              <PropertyRef Name="DeptID" />
+            </Principal>
+            <Dependent Role="EmpolyInfo">
+              <PropertyRef Name="DeptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__EmpolyInf__RoleI__3A81B327">
+          <End Role="RoleInfo" Type="Self.RoleInfo" Multiplicity="1" />
+          <End Role="EmpolyInfo" Type="Self.EmpolyInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RoleInfo">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="EmpolyInfo">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AssetDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AreaInfo" EntityType="Self.AreaInfo" />
+          <EntitySet Name="AreaTypeInfo" EntityType="Self.AreaTypeInfo" />
+          <EntitySet Name="AssetDetailInfo" EntityType="Self.AssetDetailInfo" />
+          <EntitySet Name="AssetDetailRecordInfo" EntityType="Self.AssetDetailRecordInfo" />
+          <EntitySet Name="AssetInfo" EntityType="Self.AssetInfo" />
+          <EntitySet Name="AssetPutInfo" EntityType="Self.AssetPutInfo" />
+          <EntitySet Name="AssetTypeInfo" EntityType="Self.AssetTypeInfo" />
+          <EntitySet Name="CampusInfo" EntityType="Self.CampusInfo" />
+          <EntitySet Name="DamageRecordInfo" EntityType="Self.DamageRecordInfo" />
+          <EntitySet Name="DeptInfo" EntityType="Self.DeptInfo" />
+          <EntitySet Name="EmpolyInfo" EntityType="Self.EmpolyInfo" />
+          <EntitySet Name="OfficeSuppliesRecordInfo" EntityType="Self.OfficeSuppliesRecordInfo" />
+          <EntitySet Name="RoleInfo" EntityType="Self.RoleInfo" />
+          <AssociationSet Name="FK__AreaInfo__AreaTy__267ABA7A" Association="Self.FK__AreaInfo__AreaTy__267ABA7A">
+            <End Role="AreaTypeInfo" EntitySet="AreaTypeInfo" />
+            <End Role="AreaInfo" EntitySet="AreaInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetDeta__Asset__2E1BDC42" Association="Self.FK__AssetDeta__Asset__2E1BDC42">
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+            <End Role="AssetDetailInfo" EntitySet="AssetDetailInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetInfo__Asset__2B3F6F97" Association="Self.FK__AssetInfo__Asset__2B3F6F97">
+            <End Role="AssetTypeInfo" EntitySet="AssetTypeInfo" />
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__AssetPutI__Asset__3D5E1FD2" Association="Self.FK__AssetPutI__Asset__3D5E1FD2">
+            <End Role="AssetInfo" EntitySet="AssetInfo" />
+            <End Role="AssetPutInfo" EntitySet="AssetPutInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DeptInfo__Campus__34C8D9D1" Association="Self.FK__DeptInfo__Campus__34C8D9D1">
+            <End Role="CampusInfo" EntitySet="CampusInfo" />
+            <End Role="DeptInfo" EntitySet="DeptInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__EmpolyInf__DeptI__398D8EEE" Association="Self.FK__EmpolyInf__DeptI__398D8EEE">
+            <End Role="DeptInfo" EntitySet="DeptInfo" />
+            <End Role="EmpolyInfo" EntitySet="EmpolyInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK__EmpolyInf__RoleI__3A81B327" Association="Self.FK__EmpolyInf__RoleI__3A81B327">
+            <End Role="RoleInfo" EntitySet="RoleInfo" />
+            <End Role="EmpolyInfo" EntitySet="EmpolyInfo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AssetDBModelStoreContainer" CdmEntityContainer="AssetDBEntities">
+          <EntitySetMapping Name="AreaInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AreaInfo">
+              <MappingFragment StoreEntitySet="AreaInfo">
+                <ScalarProperty Name="AreaID" ColumnName="AreaID" />
+                <ScalarProperty Name="AreaTypeID" ColumnName="AreaTypeID" />
+                <ScalarProperty Name="AreaName" ColumnName="AreaName" />
+                <ScalarProperty Name="AreaReMark" ColumnName="AreaReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AreaTypeInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AreaTypeInfo">
+              <MappingFragment StoreEntitySet="AreaTypeInfo">
+                <ScalarProperty Name="AreaTypeID" ColumnName="AreaTypeID" />
+                <ScalarProperty Name="AreaTypeName" ColumnName="AreaTypeName" />
+                <ScalarProperty Name="AreaTypeMark" ColumnName="AreaTypeMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssetDetailInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AssetDetailInfo">
+              <MappingFragment StoreEntitySet="AssetDetailInfo">
+                <ScalarProperty Name="AssetDetailID" ColumnName="AssetDetailID" />
+                <ScalarProperty Name="AssetID" ColumnName="AssetID" />
+                <ScalarProperty Name="AssetDetailNum" ColumnName="AssetDetailNum" />
+                <ScalarProperty Name="AssetDetailUseState" ColumnName="AssetDetailUseState" />
+                <ScalarProperty Name="AssetDetailUseDate" ColumnName="AssetDetailUseDate" />
+                <ScalarProperty Name="AssetDetailReturnDate" ColumnName="AssetDetailReturnDate" />
+                <ScalarProperty Name="AssetDetailServiceState" ColumnName="AssetDetailServiceState" />
+                <ScalarProperty Name="AssetDetailDumState" ColumnName="AssetDetailDumState" />
+                <ScalarProperty Name="EmpolyID" ColumnName="EmpolyID" />
+                <ScalarProperty Name="AreaID" ColumnName="AreaID" />
+                <ScalarProperty Name="AssetAreaReMark" ColumnName="AssetAreaReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssetDetailRecordInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AssetDetailRecordInfo">
+              <MappingFragment StoreEntitySet="AssetDetailRecordInfo">
+                <ScalarProperty Name="AssetDetailRecordID" ColumnName="AssetDetailRecordID" />
+                <ScalarProperty Name="AssetDetailID" ColumnName="AssetDetailID" />
+                <ScalarProperty Name="EmpolyID" ColumnName="EmpolyID" />
+                <ScalarProperty Name="AreaID" ColumnName="AreaID" />
+                <ScalarProperty Name="AssetNum" ColumnName="AssetNum" />
+                <ScalarProperty Name="AssetDetailRecordUseDate" ColumnName="AssetDetailRecordUseDate" />
+                <ScalarProperty Name="AssetDetailRecordReturnDate" ColumnName="AssetDetailRecordReturnDate" />
+                <ScalarProperty Name="AssetDetailRecordReMark" ColumnName="AssetDetailRecordReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssetInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AssetInfo">
+              <MappingFragment StoreEntitySet="AssetInfo">
+                <ScalarProperty Name="AssetID" ColumnName="AssetID" />
+                <ScalarProperty Name="AssetTypeID" ColumnName="AssetTypeID" />
+                <ScalarProperty Name="AssetName" ColumnName="AssetName" />
+                <ScalarProperty Name="AssetModel" ColumnName="AssetModel" />
+                <ScalarProperty Name="AssetCompany" ColumnName="AssetCompany" />
+                <ScalarProperty Name="AssetReMark" ColumnName="AssetReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssetPutInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AssetPutInfo">
+              <MappingFragment StoreEntitySet="AssetPutInfo">
+                <ScalarProperty Name="AssetPutID" ColumnName="AssetPutID" />
+                <ScalarProperty Name="AssetID" ColumnName="AssetID" />
+                <ScalarProperty Name="AssetPutCount" ColumnName="AssetPutCount" />
+                <ScalarProperty Name="AssetPutDate" ColumnName="AssetPutDate" />
+                <ScalarProperty Name="EmpolyID" ColumnName="EmpolyID" />
+                <ScalarProperty Name="AssetPutReMark" ColumnName="AssetPutReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssetTypeInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.AssetTypeInfo">
+              <MappingFragment StoreEntitySet="AssetTypeInfo">
+                <ScalarProperty Name="AssetTypeID" ColumnName="AssetTypeID" />
+                <ScalarProperty Name="AssetTypeName" ColumnName="AssetTypeName" />
+                <ScalarProperty Name="AssetTypeReMark" ColumnName="AssetTypeReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CampusInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.CampusInfo">
+              <MappingFragment StoreEntitySet="CampusInfo">
+                <ScalarProperty Name="CampusID" ColumnName="CampusID" />
+                <ScalarProperty Name="CampusName" ColumnName="CampusName" />
+                <ScalarProperty Name="CampusReMark" ColumnName="CampusReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DamageRecordInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.DamageRecordInfo">
+              <MappingFragment StoreEntitySet="DamageRecordInfo">
+                <ScalarProperty Name="DamageRecordlID" ColumnName="DamageRecordlID" />
+                <ScalarProperty Name="AssetDetailID" ColumnName="AssetDetailID" />
+                <ScalarProperty Name="EmpolyID" ColumnName="EmpolyID" />
+                <ScalarProperty Name="DamageDate" ColumnName="DamageDate" />
+                <ScalarProperty Name="DamageCauses" ColumnName="DamageCauses" />
+                <ScalarProperty Name="ProblemDescription" ColumnName="ProblemDescription" />
+                <ScalarProperty Name="Problemlmange" ColumnName="Problemlmange" />
+                <ScalarProperty Name="RecordState" ColumnName="RecordState" />
+                <ScalarProperty Name="Repairman" ColumnName="Repairman" />
+                <ScalarProperty Name="RepairDates" ColumnName="RepairDates" />
+                <ScalarProperty Name="DamageRecordReMark" ColumnName="DamageRecordReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DeptInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.DeptInfo">
+              <MappingFragment StoreEntitySet="DeptInfo">
+                <ScalarProperty Name="DeptID" ColumnName="DeptID" />
+                <ScalarProperty Name="CampusID" ColumnName="CampusID" />
+                <ScalarProperty Name="DeptName" ColumnName="DeptName" />
+                <ScalarProperty Name="DeptReMark" ColumnName="DeptReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmpolyInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.EmpolyInfo">
+              <MappingFragment StoreEntitySet="EmpolyInfo">
+                <ScalarProperty Name="EmpolyID" ColumnName="EmpolyID" />
+                <ScalarProperty Name="EmpolyNum" ColumnName="EmpolyNum" />
+                <ScalarProperty Name="EmpolyPwd" ColumnName="EmpolyPwd" />
+                <ScalarProperty Name="EmpolyName" ColumnName="EmpolyName" />
+                <ScalarProperty Name="EmpolySex" ColumnName="EmpolySex" />
+                <ScalarProperty Name="EmpolyldCard" ColumnName="EmpolyldCard" />
+                <ScalarProperty Name="Empolylmg" ColumnName="Empolylmg" />
+                <ScalarProperty Name="DeptID" ColumnName="DeptID" />
+                <ScalarProperty Name="EmpolyLevel" ColumnName="EmpolyLevel" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="InductionDate" ColumnName="InductionDate" />
+                <ScalarProperty Name="DepartureDate" ColumnName="DepartureDate" />
+                <ScalarProperty Name="EmpolyReMark" ColumnName="EmpolyReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OfficeSuppliesRecordInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.OfficeSuppliesRecordInfo">
+              <MappingFragment StoreEntitySet="OfficeSuppliesRecordInfo">
+                <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+                <ScalarProperty Name="AssetID" ColumnName="AssetID" />
+                <ScalarProperty Name="OfficeApplylD" ColumnName="OfficeApplylD" />
+                <ScalarProperty Name="OfficeApplyNum" ColumnName="OfficeApplyNum" />
+                <ScalarProperty Name="OfficeApplyState" ColumnName="OfficeApplyState" />
+                <ScalarProperty Name="OfficeApplyDate" ColumnName="OfficeApplyDate" />
+                <ScalarProperty Name="OfficeReceiveNum" ColumnName="OfficeReceiveNum" />
+                <ScalarProperty Name="OfficeReceiveDate" ColumnName="OfficeReceiveDate" />
+                <ScalarProperty Name="OfficeRemark" ColumnName="OfficeRemark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleInfo">
+            <EntityTypeMapping TypeName="AssetDBModel.RoleInfo">
+              <MappingFragment StoreEntitySet="RoleInfo">
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+                <ScalarProperty Name="RoleReMark" ColumnName="RoleReMark" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

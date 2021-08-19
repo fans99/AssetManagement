@@ -1,0 +1,92 @@
+﻿@model AssetManagement.ViewModels.OfficeSuppliesInfoIndexViewModel
+@{
+    Page.Title = "办公用品统计";
+    Page.ActiveIndex = 4;
+    Page.SubIndex = 1;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>资产名称:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchAssetDetailNum" autocomplete="off" class="layui-input" value="@Model.SearchName">
+                </div>
+            </div>
+            <div class="mr-5">
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+    <thead>
+        <tr>
+            <th lay-data="{field: 'AssetID', width: 100}">编号</th>
+            <th lay-data="{field: 'AssetName'}">资产名称</th>
+            <th lay-data="{field: 'AssetPutCount'}">入库数量</th>
+            <th lay-data="{field: 'UsedCount'}">已使用数量</th>
+            <th lay-data="{field: 'RemainCount'}">剩余数量</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OfficeSuppliesInfoList)
+        {
+            <tr>
+                <td>@item.AssetID</td>
+                <td>@item.AssetName</td>
+                <td>@item.AssetPutCount</td>
+                <td>@item.UsedCount</td>
+                @if(item.RemainCount > 5)
+                {
+                <td>@item.RemainCount</td>
+                }
+                else
+                {
+                <td><span class="text-red-500">@(item.RemainCount)（剩余库存不足）</span></td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var table = layui.table;
+        //转换静态表格
+        table.init('demo', {
+            toolbar: '#toolbar',
+            //page: true,
+            //limit: 5,
+            //limits: [5, 10 ,20]
+        });
+
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            //执行一个laypage实例
+            laypage.render({
+                elem: 'paging',
+                count: @Model.RowCount,
+                limit: 5,
+                limits: [5, 10, 15, 20],
+                curr: @(Model.Page??1),
+                layout: ['prev', 'page', 'next', 'skip', 'limit'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        var name = document.getElementById('SearchName').value
+                        window.location = `/OfficeSuppliesInfo/Index?SearchName=${name}&page=${obj.curr}&limit=${obj.limit}`
+                    }
+                }
+            })
+        })
+
+        $('.text-red-500').parents('tr').addClass('bg-red-200')
+
+        function searchClick() {
+            window.location = `/OfficeSuppliesInfo/Index?SearchName=${$('#SearchName').val()}`
+        }
+    </script>
+}

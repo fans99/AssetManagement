@@ -1,0 +1,54 @@
+﻿@model AssetManagement.ViewModels.AssetDetailInfoTotalViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "固定资产统计";
+    Page.ActiveIndex = 3;
+    Page.SubIndex = 3;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<table id="dataTable" lay-filter="demo">
+    @{ 
+        AssetDBEntities context = new AssetDBEntities();
+    }
+    <thead>
+        <tr>
+            <th lay-data="{field: 'AssetDetailType', width: 150, align: 'center'}">固定资产类型</th>
+            @foreach (AreaInfo item in Model.AreaInfoList)
+            {
+            <th lay-data="{field: 'AreaID_@(item.AreaID)', align: 'center'}">@item.AreaName</th>
+            }
+            <th lay-data="{field: 'Total', width: 130, align: 'center'}">合计</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AssetDetailInfo assetDetailInfo in Model.AssetDetailInfoList)
+        {
+            <tr>
+                <td>@assetDetailInfo.AssetInfo.AssetName</td>
+                @{ 
+                    int total = 0;
+                }
+                @foreach (AreaInfo areaInfo in Model.AreaInfoList)
+                {
+                    int count = context.AssetDetailRecordInfo.Where(p => p.AssetDetailID == assetDetailInfo.AssetDetailID && p.AreaID == areaInfo.AreaID && !p.AssetDetailRecordReturnDate.HasValue).ToList().Sum(x => x.AssetNum);
+                    total += count;
+                <td>@count</td>
+                }
+                <td>@total</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Script{
+    <script>
+        var table = layui.table;
+        //转换静态表格
+        table.init('demo', {
+            //toolbar: '#toolbar',
+            //page: true,
+            //limit: 5,
+            //limits: [5, 10 ,20]
+        });
+    </script>
+}

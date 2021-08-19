@@ -1,0 +1,128 @@
+﻿@model AssetManagement.ViewModels.AssetDetailRecordInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "Index";
+    Page.ActiveIndex = 3;
+    Page.SubIndex = 1;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>资产编号:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchAssetDetailNum" autocomplete="off" class="layui-input" value="@Model.SearchAssetDetailNum">
+                </div>
+            </div>
+            <div class="mr-5">
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+    <thead>
+        <tr>
+            <th lay-data="{field: 'AssetDetailRecordID', width: 100}">编号</th>
+            <th lay-data="{field: 'AssetDetailNum'}">资产明细编号</th>
+            <th lay-data="{field: 'EmpolyName'}">员工</th>
+            <th lay-data="{field: 'AreaName'}">区域名称</th>
+            <th lay-data="{field: 'AssetNum'}">使用数量</th>
+            <th lay-data="{field: 'AssetDetailRecordUseDate'}">使用日期</th>
+            <th lay-data="{field: 'AssetDetailRecordReturnDate'}">归还日期</th>
+            <th lay-data="{field: 'AssetDetailRecordReMark'}">备注</th>
+            <th lay-data="{field: 'Option', width: 100, hide: @(Model.IsAdmin ? "true" : "false")}">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            AssetDBEntities context = new AssetDBEntities();
+            int index = 0;
+        }
+        @foreach (AssetDetailRecordInfo item in Model.AssetDetailRecordInfoList)
+        {
+        <tr>
+
+            <td>@item.AssetDetailRecordID</td>
+            <td>@(context.AssetDetailInfo.Find(item.AssetDetailID).AssetDetailNum)</td>
+            <td>@(context.EmpolyInfo.Find(item.EmpolyID).EmpolyName)</td>
+            <td>@(context.AreaInfo.Find(item.AreaID).AreaName)</td>
+            <td>@item.AssetNum</td>
+            <td>@item.AssetDetailRecordUseDate.ToString("yyyy-MM-dd")</td>
+            <td>@(item.AssetDetailRecordReturnDate.HasValue ? item.AssetDetailRecordReturnDate.Value.ToString("yyyy-MM-dd") : "")</td>
+            <td>@item.AssetDetailRecordReMark</td>
+            @if (Model.IsAdmin)
+            {
+            <td></td>
+            }
+            else
+            {
+            <td><button class="layui-btn layui-btn-xs layui-btn-danger" onclick="updateClick(@(index++))">归还</button></td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var table = layui.table;
+        //转换静态表格
+        table.init('demo', {
+            toolbar: '#toolbar',
+            //page: true,
+            //limit: 5,
+            //limits: [5, 10 ,20]
+        });
+
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            //执行一个laypage实例
+            laypage.render({
+                elem: 'paging',
+                count: @Model.RowCount,
+                limit: 5,
+                limits: [5, 10, 15, 20],
+                curr: @(Model.Page??1),
+                layout: ['prev', 'page', 'next', 'skip', 'limit'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        var name = document.getElementById('SearchName').value
+                        window.location = `/AssetDetailRecordInfo/Index?SearchAssetDetailNum=${name}&page=${obj.curr}&limit=${obj.limit}`
+                    }
+                }
+            })
+        })
+
+        function searchClick() {
+            window.location = `/AssetDetailRecordInfo/Index?SearchAssetDetailNum=${$('#SearchAssetDetailNum').val()}`
+        }
+
+        function updateClick(index) {
+            $.ajax({
+                url: '/AssetDetailRecordInfo/Update',
+                method: 'post',
+                data: {
+                    id: table.getData('dataTable')[index].AssetDetailRecordID
+                },
+                success: (data) => {
+                    if (data.code === 0) {
+                        layer.alert('归还成功', {
+                            title: '提示',
+                            icon: 1
+                        }, () => window.location.reload())
+                    }
+                    else {
+                        layer.alert('归还成功', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

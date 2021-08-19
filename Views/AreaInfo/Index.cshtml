@@ -1,0 +1,287 @@
+﻿@model AssetManagement.ViewModels.AreaInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "区域管理";
+    Page.ActiveIndex = 1;
+    Page.SubIndex = 1;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="AreaID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">区域名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AreaName" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">区域类别:</label>
+                <div class="layui-input-block">
+                    <select id="AreaTypeID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (AreaTypeInfo item in Model.AreaTypeInfoList)
+                        {
+                            <option value="@item.AreaTypeID">@item.AreaTypeName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">区域说明:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AreaReMark" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">添加</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>部门名称:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+            <div class="flex items-center">
+                <span>校区:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="SearchAreaTypeID" class="-ml-2" data-value="0">全部</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        @foreach (AreaTypeInfo item in Model.AreaTypeInfoList)
+                        {
+                            <li><a class="dropdown-item cursor-pointer" data-value="@item.AreaTypeID">@item.AreaTypeName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="ml-5">
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">   
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchAreaTypeID: '0',
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/AreaInfo/GetAreaInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+                bindChange()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'AreaID',
+                },
+                {
+                    title: '区域名称',
+                    field: 'AreaName',
+                },
+                {
+                    title: '区域类别',
+                    field: 'AreaTypeName',
+                },
+                {
+                    title: '备注',
+                    field: 'AreaReMark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 130,
+                    templet:
+                        `<div>
+                                <button class="layui-btn layui-btn-xs layui-btn-warm" onclick="updateClick({{d.LAY_TABLE_INDEX}})">编辑</button>
+                                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="removeClick({{d.LAY_TABLE_INDEX}})">删除</button>
+                        </div>`
+                },
+            ]]
+        });
+
+        function bindChange() {
+            $('.dropdown-item').click(function (event) {
+                var SearchAreaTypeID = document.getElementById('SearchAreaTypeID')
+                $(SearchAreaTypeID).text(event.target.innerText)
+                SearchAreaTypeID.dataset['value'] = event.target.dataset['value']
+            })
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            document.getElementById('SearchAreaTypeID').dataset['value'] = searchParams.SearchAreaTypeID
+            $('.dropdown-item').get().forEach(item => {
+                if (item.dataset['value'] === searchParams.SearchAreaTypeID)
+                    $('#SearchAreaTypeID').text(item.innerText)
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchAreaTypeID = document.getElementById('SearchAreaTypeID').dataset['value']
+            table.reload('dataTable', {
+                url: '/AreaInfo/GetAreaInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchAreaTypeID: searchParams.SearchAreaTypeID,
+                },
+            }, true);
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '添加区域',
+                area: ['600px', '320px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('添加').click(submitClick)
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '修改区域',
+                area: ['600px', '320px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $('#AreaID').val(rowData.AreaID)
+            $('#AreaName').val(rowData.AreaName)
+            $('#AreaTypeID').val(rowData.AreaTypeID)
+            $('#AreaReMark').val(rowData.AreaReMark)
+            document.getElementById('submitButton').dataset['type'] = 'update'
+            $('#submitButton').text('修改').click(submitClick)
+        }
+
+        function submitClick(event) {
+            if (event.target.dataset['type'] === 'create') {
+                $.ajax({
+                    url: '/AreaInfo/Create',
+                    method: 'post',
+                    data: {
+                        AreaName: $('#AreaName').val(),
+                        AreaTypeID: $('#AreaTypeID').val(),
+                        AreaReMark: $('#AreaReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('添加成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('添加失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+            else if (event.target.dataset['type'] === 'update') {
+                $.ajax({
+                    url: '/AreaInfo/Update',
+                    method: 'post',
+                    data: {
+                        AreaID: $('#AreaID').val(),
+                        AreaName: $('#AreaName').val(),
+                        AreaTypeID: $('#AreaTypeID').val(),
+                        AreaReMark: $('#AreaReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('修改成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('修改失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+        }
+
+        function removeClick(index) {
+            $.ajax({
+                url: '/AreaInfo/Delete',
+                method: 'post',
+                data: {
+                    id: table.getData('dataTable')[index].AreaID
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('删除成功', {
+                            title: '提示',
+                            icon: 1
+                        }, index => {
+                            table.reload('dataTable')
+                            layer.close(index)
+                        })
+
+                    }
+                    else {
+                        layer.alert('删除失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

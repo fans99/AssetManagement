@@ -1,0 +1,317 @@
+﻿@model AssetManagement.ViewModels.AssetDetailInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "明细资产使用管理";
+    Page.ActiveIndex = 3;
+    Page.SubIndex = 0;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="AssetPutID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产名称:</label>
+                <div class="layui-input-block">
+                    <select id="AssetDetailID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (AssetDetailInfo item in Model.AssetDetailInfoList)
+                        {
+                            <option value="@item.AssetDetailID">@item.AssetInfo.AssetName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">员工:</label>
+                <div class="layui-input-block">
+                    <select id="EmpolyID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (EmpolyInfo item in Model.EmpolyInfoList)
+                        {
+                            <option value="@item.EmpolyID">@item.EmpolyName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">区域:</label>
+                <div class="layui-input-block">
+                    <select id="AreaID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (AreaInfo item in Model.AreaInfoList)
+                        {
+                            <option value="@item.AreaID">@item.AreaName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">数量:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetNum" autocomplete="off" required class="layui-input" placeholder="请输分配资产数量">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">开始时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetDetailRecordUseDate" autocomplete="off" required class="layui-input" placeholder="请选择开始时间">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">备注:</label>
+                <div class="layui-input-block">
+                    <textarea id="AssetDetailRecordReMark" class="border outline-none w-full h-32 pl-4 py-1"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">分配</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <span>资产名称:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>状态:</span>
+                <div class="layui-input-inline">
+                    <input type="radio" name="SearchAssetDetailUseState" value="0" title="已使用" />
+                    <input type="radio" name="SearchAssetDetailUseState" value="1" title="未使用" />
+                    <input type="radio" name="SearchAssetDetailUseState" value="" title="全部" checked />
+                </div>
+            </div>
+
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">分配</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+</table>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchAssetDetailUseState: '',
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/AssetDetailInfo/GetAssetDetailInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'AssetDetailID',
+                    width: 100
+                },
+                {
+                    title: '资产名称',
+                    field: 'AssetName',
+                },
+                {
+                    title: '资产编号',
+                    field: 'AssetDetailNum',
+                },
+                {
+                    title: '使用状态',
+                    field: 'AssetDetailUseState',
+                    templet: function (d) {
+                        if (d.AssetDetailUseState === 0) {
+                            return '已使用'
+                        }
+                        else if (d.AssetDetailUseState === 1) {
+                            return '未使用'
+                        }
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '使用日期',
+                    field: 'AssetDetailUseDate',
+                },
+                {
+                    title: '归还日期',
+                    field: 'AssetDetailReturnDate',
+                },
+                {
+                    title: '是否维修',
+                    field: 'AssetDetailServiceState',
+                    templet: function (d) {
+                        if (d.AssetDetailServiceState === 0) {
+                            return '正常'
+                        }
+                        else if (d.AssetDetailServiceState === 1) {
+                            return '需维修'
+                        }
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '是否报废',
+                    field: 'AssetDetailDumState',
+                    templet: function (d) {
+                        if (d.AssetDetailDumState === 0) {
+                            return '正常'
+                        }
+                        else if (d.AssetDetailDumState === 1) {
+                            return '报废'
+                        }
+                        else
+                            return ''
+                    }
+                },
+                {
+                    title: '使用员工',
+                    field: 'EmpolyName',
+                },
+                {
+                    title: '使用区域',
+                    field: 'AreaName',
+                },
+                {
+                    title: '备注',
+                    field: 'AssetAreaReMark',
+                }
+            ]]
+        });
+
+        function validateFormat() {
+            var result = true
+            var AssetNum = $('#AssetNum')
+            if (!/^[0-9]+$/.test(AssetNum.val())) {
+                AssetNum.addClass('border-red-400')
+                AssetNum.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var AssetDetailRecordUseDate = $('#AssetDetailRecordUseDate')
+            if (AssetDetailRecordUseDate.val() === '' || isNaN(new Date(AssetDetailRecordUseDate.val()).getDate())) {
+                AssetDetailRecordUseDate.addClass('border-red-400')
+                AssetDetailRecordUseDate.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            return result
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            $('input[name="SearchAssetDetailUseState"]').get().forEach(item => {
+                if (item.value === searchParams.SearchAssetDetailUseState)
+                    $(item).next('.layui-form-radio').trigger('click')
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchAssetDetailUseState = $('input[name="SearchAssetDetailUseState"]:checked').val()
+            table.reload('dataTable', {
+                url: '/AssetDetailInfo/GetAssetDetailInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchAssetDetailUseState: searchParams.SearchAssetDetailUseState,
+                },
+            }, true);
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '分配固定资产',
+                area: ['600px', '550px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('分配').click(submitClick)
+            $('#AssetDetailRecordUseDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+        }       
+
+        function submitClick(event) {
+            if (!validateFormat())
+                return false
+
+            if (event.target.dataset['type'] === 'create') {
+                $.ajax({
+                    url: '/AssetDetailInfo/Distribution',
+                    method: 'post',
+                    data: {
+                        AssetDetailID: $('#AssetDetailID').val(),
+                        EmpolyID: $('#EmpolyID').val(),
+                        AreaID: $('#AreaID').val(),
+                        AssetNum: $('#AssetNum').val(),
+                        AssetDetailRecordUseDate: $('#AssetDetailRecordUseDate').val(),
+                        AssetDetailRecordReMark: $('#AssetDetailRecordReMark').val().trim(),
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert(`分配成功, 目前剩余${_data.remain}`, {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else if (_data.code === 2) {
+                            layer.alert(`剩余资产数量不足, 目前剩余${_data.remain}`, {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                        else {
+                            layer.alert('分配失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }            
+        }
+    </script>
+}

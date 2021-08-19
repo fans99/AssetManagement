@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="/assets/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/css/animate.min.css" rel="stylesheet" />
+    <link href="/assets/css/style.min.css" rel="stylesheet" />
+    <link href="/assets/css/style-responsive.min.css" rel="stylesheet" />
+    <link href="/assets/css/theme/default.css" rel="stylesheet" id="theme" />
+    <link rel="stylesheet" href="~/lib/layui/css/layui.min.css" />
+    <link rel="stylesheet" href="~/lib/tailwindcss/tailwind.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-datetime-picker/css/bootstrap-datetimepicker.min.css" />
+    <style>
+        .layui-table-view {
+            background-color: #fff;
+        }
+    </style>
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/plugins/pace/pace.min.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <script>
+        var activeIndex = @(Page.ActiveIndex??-1)
+        var subActiveIndex = @(Page.SubIndex??-1)
+    </script>
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+        <!-- begin #header -->
+        <div id="header" class="header navbar navbar-default navbar-fixed-top">
+            <!-- begin container-fluid -->
+            <div class="container-fluid">
+                <!-- begin mobile sidebar expand / collapse button -->
+                <div class="navbar-header">
+                    <a href="/home/index" class="navbar-brand">
+                        <span><img src="~/Content/img/logo.png" class="border-0 w-12 h-12 mr-4" /></span>
+                        资产管理系统
+                    </a>
+                    <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <!-- end mobile sidebar expand / collapse button -->
+                <!-- begin header navigation right -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <form class="navbar-form full-width">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="搜索关键字" />
+                                <button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="dropdown navbar-user">
+                        @using AssetManagement.Models
+                        @{
+                            AssetDBEntities context = new AssetDBEntities();
+                            EmpolyInfo emp = context.EmpolyInfo.Find(string.IsNullOrEmpty(User.Identity.Name)?0:Convert.ToInt32(User.Identity.Name));
+                            if (emp == null)
+                            {
+                                Response.Redirect("/home/login");
+                            }
+                        }
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                            <img src='@(string.IsNullOrEmpty(emp.Empolylmg) ? "/Content/img/default-user.png" : "/Content/upload/user/" + emp.Empolylmg)' alt="" />
+                            <span class="hidden-xs">@emp.EmpolyName</span> <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInLeft">
+                            <li class="arrow"></li>
+                            <li><a href="/Home/Profile">查看个人信息</a></li>
+                            <li><a href="/Home/Password">修改密码</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/Home/Logout">退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <!-- end header navigation right -->
+            </div>
+            <!-- end container-fluid -->
+        </div>
+        <!-- end #header -->
+        <!-- begin #sidebar -->
+        <div id="sidebar" class="sidebar">
+            <!-- begin sidebar scrollbar -->
+            <div data-scrollbar="true" data-height="100%">
+                <!-- begin sidebar user -->
+                <ul class="nav">
+                    <li class="nav-profile">
+                        <div class="image">                           
+                            <a href="javascript:;"><img src='@(string.IsNullOrEmpty(emp.Empolylmg) ? "/Content/img/default-user.png" : "/Content/upload/user/" + emp.Empolylmg)' alt="" /></a>
+                        </div>
+                        <div class="info">
+                            @emp.EmpolyName
+                            <small>@emp.RoleInfo.RoleName</small>
+                        </div>
+                    </li>
+                </ul>
+                <!-- end sidebar user -->
+                <!-- begin sidebar nav -->
+                <ul id="navMenu" class="nav">
+                    <li class="nav-header">导航</li>
+                    @if (new int[] { 1 }.Contains(emp.RoleID))
+                    {
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-list-alt"></i>
+                            <span>校区基础数据</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/CampusInfo/Index">校区管理</a></li>
+                            <li><a href="/DeptInfo/Index">部门管理</a></li>
+                            <li><a href="/RoleInfo/Index">角色管理</a></li>
+                            <li><a href="/EmpolyInfo/Index">员工管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-bar-chart"></i>
+                            <span>资产基础数据</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/AreaTypeInfo/Index">区域类别</a></li>
+                            <li><a href="/AreaInfo/Index">区域管理</a></li>
+                            <li><a href="/AssetInfo/Index">资产管理</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/AssetPutInfo/Index"><i class="fa fa-database"></i><span>资产入库管理</span></a></li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-bank"></i>
+                            <span>固定资产管理</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/AssetDetailInfo/Index">明细资产使用管理</a></li>
+                            <li><a href="/AssetDetailRecordInfo/Index">固定资产使用登记</a></li>
+                            <li><a href="/DamageRecordInfo/Index">明细资产损坏维修</a></li>
+                            <li><a href="/AssetDetailInfo/Total">固定资产统计</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-cubes"></i>
+                            <span>办公用品管理</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/OfficeSuppliesRecordInfo/Index">办公用品领用</a></li>
+                            <li><a href="/OfficeSuppliesInfo/Index">办公用品统计</a></li>
+                        </ul>
+                    </li>
+                    }
+                    else
+                    {
+                    <li class="has-sub hidden">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-list-alt"></i>
+                            <span>校区基础数据</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/CampusInfo/Index">校区管理</a></li>
+                            <li><a href="/DeptInfo/Index">部门管理</a></li>
+                            <li><a href="/RoleInfo/Index">角色管理</a></li>
+                            <li><a href="/EmpolyInfo/Index">员工管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub hidden">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-bar-chart"></i>
+                            <span>资产基础数据</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/AreaTypeInfo/Index">区域类别</a></li>
+                            <li><a href="/AreaInfo/Index">区域管理</a></li>
+                            <li><a href="/AssetInfo/Index">资产管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="hidden"><a href="/AssetPutInfo/Index"><i class="fa fa-database"></i><span>资产入库管理</span></a></li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-bank"></i>
+                            <span>固定资产管理</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="hidden"><a href="/AssetDetailInfo/Index">明细资产使用管理</a></li>
+                            <li><a href="/AssetDetailRecordInfo/Index">固定资产使用登记</a></li>
+                            <li><a href="/DamageRecordInfo/Index">明细资产损坏维修</a></li>
+                            <li class="hidden"><a href="#">固定资产统计</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-cubes"></i>
+                            <span>办公用品管理</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/OfficeSuppliesRecordInfo/Index">办公用品领用</a></li>
+                            <li class="hidden"><a href="#">办公用品统计</a></li>
+                        </ul>
+                    </li>
+                    }
+                </ul>
+                <!-- end sidebar nav -->
+            </div>
+            <!-- end sidebar scrollbar -->
+        </div>
+        <div class="sidebar-bg"></div>
+        <!-- end #sidebar -->
+        <!-- begin #content -->
+        <div id="content" class="content">
+            @RenderBody()
+        </div>
+        <!-- end #content -->
+        <!-- begin scroll to top btn -->
+        <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+        <!-- end scroll to top btn -->
+    </div>
+    <!-- end page container -->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="/assets/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="/assets/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="~/lib/moment.js/moment.min.js"></script>
+    <script src="/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap-datetime-picker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/lib/bootstrap-datetime-picker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <!--[if lt IE 9]>
+        <script src="/assets/crossbrowserjs/html5shiv.js"></script>
+        <script src="/assets/crossbrowserjs/respond.min.js"></script>
+        <script src="/assets/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="/assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/assets/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+    <script src="/assets/js/apps.min.js"></script>
+    <!-- ================== END PAGE LEVEL JS ================== -->
+
+    <script>
+        $(document).ready(function () {
+            App.init();
+            if (activeIndex >= 0) {
+                var target = $('#navMenu').children('li').not('.nav-header').eq(activeIndex)
+                if (target.prop('class').indexOf('has-sub') === -1)
+                    target.addClass('active')
+                else {
+                    target.addClass('active')
+                    target.addClass('expand')
+                    target.children('.sub-menu').children('li').eq(subActiveIndex).addClass('active')
+                }
+            }
+        });
+    </script>    
+    <script src="~/lib/layui/layui.min.js"></script>
+    @RenderSection("Script", required: false)
+</body>
+</html>

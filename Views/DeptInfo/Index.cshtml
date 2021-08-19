@@ -1,0 +1,325 @@
+﻿@model AssetManagement.ViewModels.DeptInfoIndexViewModel
+@using AssetManagement.Models
+@{
+    Page.Title = "部门管理";
+    Page.ActiveIndex = 0;
+    Page.SubIndex = 1;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="DeptID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">部门名称</label>
+                <div class="layui-input-block">
+                    <input type="text" id="DeptName" autocomplete="off" onblur="existAction()" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">校区:</label>
+                <div class="layui-input-block">
+                    <select id="CampusID" class="w-full h-14 pl-3 border cursor-pointer">
+                        @foreach (CampusInfo item in Model.CampusInfoList)
+                        {
+                            <option value="@item.CampusID">@item.CampusName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">部门说明</label>
+                <div class="layui-input-block">
+                    <input type="text" id="DeptReMark" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">添加</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <label>部门名称:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" required autocomplete="off" class="layui-input" value="@Model.SearchName">
+                </div>
+            </div>
+            <div class="flex items-center">
+                <span>校区:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        @{ 
+                            var campusInfo = Model.CampusInfoList.SingleOrDefault(p => p.CampusID == Model.SearchCampusID);
+                        }
+                        <span id="SearchCampusID" class="-ml-2" data-value="@(Model.SearchCampusID)">@(campusInfo == null ? "全部" : campusInfo.CampusName)</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        @foreach (CampusInfo item in Model.CampusInfoList)
+                        {
+                            <li><a class="dropdown-item cursor-pointer" data-value="@item.CampusID">@item.CampusName</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="ml-5">
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+    <thead>
+        <tr>
+            <th lay-data="{field: 'DeptID', width: 100}">部门编号</th>
+            <th lay-data="{field: 'DeptName'}">部门</th>
+            <th lay-data="{field: 'CampusName'}">校区名称</th>
+            <th lay-data="{field: 'DeptReMark'}">部门描述</th>
+            <th lay-data="{field: 'Option', width: 130}">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = 0;
+        }
+        @foreach (DeptInfo item in Model.DeptInfoList)
+        {
+        <tr>
+
+            <td>@item.DeptID</td>
+            <td>@item.DeptName</td>
+            <td>@item.CampusInfo.CampusName</td>
+            <td>@item.DeptReMark</td>
+            <td>
+                <button class="layui-btn layui-btn-xs layui-btn-warm" onclick="updateClick(@(index++))">编辑</button>
+                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="removeClick(@(item.DeptID))">删除</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+<div id="paging"></div>
+
+@section Script{
+    <script>
+        var tableData = []
+        @foreach (DeptInfo item in Model.DeptInfoList)
+        {
+        <text>
+        tableData.push({
+            DeptID: @(item.DeptID),
+            DeptName: '@(item.DeptName)',
+            CampusID: @(item.CampusID),
+            CampusName: '@(item.CampusInfo.CampusName)',
+            DeptReMark: '@(item.DeptReMark)'
+        });
+        </text>
+        };
+
+        var table = layui.table;
+        //转换静态表格
+        table.init('demo', {
+            toolbar: '#toolbar',
+            //page: true,
+            //limit: 5,
+            //limits: [5, 10 ,20]
+        });
+
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            //执行一个laypage实例
+            laypage.render({
+                elem: 'paging',
+                count: @Model.RowCount,
+                limit: 5,
+                limits: [5, 10, 15, 20],
+                curr: @(Model.Page??1),
+                layout: ['prev', 'page', 'next', 'skip', 'limit'],
+                jump: function (obj, first) {
+                    if (!first) {
+                        var SearchName = document.getElementById('SearchName').value
+                        var SearchCampusID = document.getElementById('SearchCampusID').dataset['value']
+                        window.location = `/DeptInfo/Index?SearchName=${SearchName}&SearchCampusID=${SearchCampusID}&page=${obj.curr}&limit=${obj.limit}`
+                    }
+                }
+            })
+        })
+
+        $('.dropdown-item').click(function (event) {
+            var SearchCampusID = document.getElementById('SearchCampusID')
+            $(SearchCampusID).text(event.target.innerText)
+            SearchCampusID.dataset['value'] = event.target.dataset['value']
+        })
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            var SearchName = $('#SearchName').val()
+            var SearchCampusID = document.getElementById('SearchCampusID').dataset['value']
+            window.location = `/DeptInfo/Index?SearchName=${SearchName}&SearchCampusID=${SearchCampusID}`
+        }
+
+        function existAction() {
+            $.ajax({
+                url: '/DeptInfo/Exist',
+                method: 'get',
+                data: {
+                    DeptName: document.getElementById('DeptName').value
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.msg('部门已存在')
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '添加部门',
+                area: ['600px', '320px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('添加').click(submitClick)
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '修改部门',
+                area: ['600px', '320px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+
+            var rowData = tableData[index]
+            $('#DeptID').val(rowData.DeptID)
+            $('#DeptName').val(rowData.DeptName)
+            $('#CampusID').val(rowData.CampusID)
+            $('#DeptReMark').val(rowData.DeptReMark)
+            document.getElementById('submitButton').dataset['type'] = 'update'
+            $('#submitButton').text('修改').click(submitClick)
+        }
+
+        function submitClick(event) {
+            $.ajax({
+                url: '/DeptInfo/Exist',
+                method: 'get',
+                data: {
+                    DeptName: document.getElementById('DeptName').value
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.msg('部门已存在')
+                    }
+                    else {
+                        if (event.target.dataset['type'] === 'create') {
+                            $.ajax({
+                                url: '/DeptInfo/Create',
+                                method: 'post',
+                                data: {
+                                    DeptName: $('#DeptName').val(),
+                                    CampusID: $('#CampusID').val(),
+                                    DeptReMark: $('#DeptReMark').val()
+                                },
+                                success: function (_data) {
+                                    if (_data.code === 0) {
+                                        layer.alert('添加成功', {
+                                            title: '提示',
+                                            icon: 1
+                                        }, () => window.location.reload())
+                                        layer.closeAll('page')
+                                    }
+                                    else {
+                                        layer.alert('添加失败', {
+                                            title: '提示',
+                                            icon: 2
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                        else if (event.target.dataset['type'] === 'update') {
+                            $.ajax({
+                                url: '/DeptInfo/Update',
+                                method: 'post',
+                                data: {
+                                    DeptID: $('#DeptID').val(),
+                                    DeptName: $('#DeptName').val(),
+                                    CampusID: $('#CampusID').val(),
+                                    DeptReMark: $('#DeptReMark').val()
+                                },
+                                success: function (_data) {
+                                    if (_data.code === 0) {
+                                        layer.alert('修改成功', {
+                                            title: '提示',
+                                            icon: 1
+                                        }, () => window.location.reload())
+                                        layer.closeAll('page')
+                                    }
+                                    else {
+                                        layer.alert('修改失败', {
+                                            title: '提示',
+                                            icon: 2
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+        function removeClick(id) {
+            $.ajax({
+                url: '/DeptInfo/Delete',
+                method: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.code === 0) {
+                        layer.alert('删除成功', {
+                            title: '提示',
+                            icon: 1
+                        }, function () {
+                            window.location.reload()
+                        })
+
+                    }
+                    else {
+                        layer.alert('删除失败', {
+                            title: '提示',
+                            icon: 2
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+}

@@ -1,0 +1,368 @@
+﻿@{
+    Page.Title = "资产入库";
+    Page.ActiveIndex = 2;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head{
+    <script id="ModalForm" type="text/html">
+        <form class="pt-8 pr-8 relative h-full">
+            <input type="hidden" id="AssetPutID" value="" />
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产类别:</label>
+                <div class="layui-input-block">
+                    <select id="AssetTypeID" class="w-full h-14 pl-3 border cursor-pointer">
+                        <option value="1">固定资产</option>
+                        <option value="2">办公用品</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产名称:</label>
+                <div class="layui-input-block">
+                    <select id="AssetID" class="w-full h-14 pl-3 border cursor-pointer"></select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">入库数量:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetPutCount" autocomplete="off" required class="layui-input" placeholder="请输入库数量">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">入库时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" id="AssetPutDate" autocomplete="off" required class="layui-input" placeholder="请选择入库时间">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label box-content">资产说明:</label>
+                <div class="layui-input-block">
+                    <textarea id="AssetPutReMark" class="border outline-none w-full h-32 pl-4 py-1"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center float-right absolute bottom-8 right-8">
+                <button type="button" class="layui-btn layui-btn-primary layui-border-black mr-2" onclick="closeClick()">关闭</button>
+                <button type="button" id="submitButton" class="layui-btn layui-btn-normal" data-type="create">添加</button>
+            </div>
+            <div class="clear-both"></div>
+        </form>
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <div class="flex items-center">
+            <div class="mr-5">
+                <span>资产名称:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchName" autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="mr-5">
+                <span>入库人员:</span>
+                <div class="layui-input-inline">
+                    <input type="text" id="SearchEmpolyName" autocomplete="off" class="layui-input" value="">
+                </div>
+            </div>
+
+            <div class="flex items-center mr-5">
+                <span>资产类别:</span>
+                <div class="dropdown ml-3">
+                    <button class="btn btn-default dropdown-toggle w-64 relative" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="SearchAssetTypeID" class="-ml-2" data-value="0">全部</span>
+                        <span class="caret absolute right-5" style="top: 40%;"></span>
+                        <div class="clear-both"></div>
+                    </button>
+                    <ul id="AssetTypeList" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="dropdown-item cursor-pointer" data-value="0">全部</a></li>
+                        <li><a class="dropdown-item cursor-pointer" data-value="1">固定资产</a></li>
+                        <li><a class="dropdown-item cursor-pointer" data-value="2">办公用品</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <button class="layui-btn layui-btn-sm" onclick="searchClick()">查询</button>
+                <button id="add" class="layui-btn layui-btn-sm" onclick="createClick()">添加</button>
+            </div>
+        </div>
+    </script>
+}
+<table id="dataTable" lay-filter="demo">
+</table>
+
+@section Script{
+    <script>
+        var searchParams = {
+            SearchName: '',
+            SearchEmpolyName: '',
+            SearchAssetTypeID: '0',
+        }
+        var table = layui.table
+        table.render({
+            elem: '#dataTable',
+            url: '/AssetPutInfo/GetAssetPutInfos',
+            method: 'post',
+            toolbar: '#toolbar',
+            page: true,
+            limit: 5,
+            limits: [5, 10, 15, 20],
+            done: function (res, curr, count) {
+                bindToolData()
+                bindChange()
+            },
+            cols: [[
+                {
+                    title: '编号',
+                    field: 'AssetPutID',
+                    width: 100
+                },
+                {
+                    title: '资产名称',
+                    field: 'AssetName',
+                },
+                {
+                    title: '资产类别',
+                    field: 'AssetTypeName',
+                },
+                {
+                    title: '入库数量',
+                    field: 'AssetPutCount',
+                },
+                {
+                    title: '入库人员',
+                    field: 'EmpolyName',
+                },
+                {
+                    title: '入库日期',
+                    field: 'AssetPutDate',
+                },
+                {
+                    title: '备注',
+                    field: 'AssetPutReMark',
+                },
+                {
+                    title: '操作',
+                    field: 'Option',
+                    width: 130,
+                    templet:
+                        `<div>
+                                <button class="layui-btn layui-btn-xs layui-btn-warm" onclick="updateClick({{d.LAY_TABLE_INDEX}})">编辑</button>
+                        </div>`
+                },
+            ]]
+        });
+
+        function validateFormat() {
+            var result = true
+            var AssetPutCount = $('#AssetPutCount')
+            if (!/^[0-9]+$/.test(AssetPutCount.val())) {
+                AssetPutCount.addClass('border-red-400')
+                AssetPutCount.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            var AssetPutDate = $('#AssetPutDate')
+            if (AssetPutDate.val() === '' || isNaN(new Date(AssetPutDate.val()).getDate())) {
+                AssetPutDate.addClass('border-red-400')
+                AssetPutDate.blur(function (event) {
+                    $(event.target).removeClass('border-red-400')
+                })
+                result = false
+            }
+
+            return result
+        }
+
+        function unionBind(done) {
+            $.ajax({
+                url: '/AssetInfo/GetAssetInfos',
+                method: 'post',
+                data: {
+                    SearchAssetTypeID: $('#AssetTypeID').val()
+                },
+                success: (res) => {
+                    if (res.code === 0) {
+                        $('#AssetID').empty()
+                        res.data.forEach(item => {
+                            $('#AssetID').append(`<option value="${item.AssetID}">${item.AssetName}</option>`)
+                        })
+                        if (done != undefined && done != null) {
+                            done()
+                        }
+                    }
+                }
+            })
+        }        
+
+        function bindChange() {
+            $('#AssetTypeList .dropdown-item').click(function (event) {
+                var SearchAssetTypeID = document.getElementById('SearchAssetTypeID')
+                $(SearchAssetTypeID).text(event.target.innerText)
+                SearchAssetTypeID.dataset['value'] = event.target.dataset['value']
+            })
+        }
+
+        function bindToolData() {
+            $('#SearchName').val(searchParams.SearchName)
+            $('#SearchEmpolyName').val(searchParams.SearchEmpolyName)
+            document.getElementById('SearchAssetTypeID').dataset['value'] = searchParams.SearchAssetTypeID
+            $('#AssetTypeList .dropdown-item').get().forEach(item => {
+                if (item.dataset['value'] === searchParams.SearchAssetTypeID)
+                    $('#SearchAssetTypeID').text(item.innerText)
+            })
+        }
+
+        function closeClick() {
+            layer.closeAll('page')
+        }
+
+        function searchClick() {
+            searchParams.SearchName = $('#SearchName').val()
+            searchParams.SearchEmpolyName = $('#SearchEmpolyName').val()
+            searchParams.SearchAssetTypeID = document.getElementById('SearchAssetTypeID').dataset['value']
+            table.reload('dataTable', {
+                url: '/AssetPutInfo/GetAssetPutInfos',
+                where: {
+                    SearchName: searchParams.SearchName,
+                    SearchEmpolyName: searchParams.SearchEmpolyName,
+                    SearchAssetTypeID: searchParams.SearchAssetTypeID,
+                },
+            }, true);
+        }
+
+        function createClick() {
+            layer.open({
+                type: 1,
+                title: '资产入库',
+                area: ['600px', '500px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+            $('#AssetTypeID, #AssetID').removeAttr('disabled')
+            unionBind()
+            document.getElementById('submitButton').dataset['type'] = 'create'
+            $('#submitButton').text('添加').click(submitClick)
+            $('#AssetPutDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+            $('#AssetTypeID').change(function (event) {
+                unionBind()
+            })
+        }
+
+        function updateClick(index) {
+            layer.open({
+                type: 1,
+                title: '修改资产',
+                area: ['600px', '500px'],
+                fixed: true,
+                maxmin: false,
+                content: $('#ModalForm').html()
+            });
+
+            var rowData = table.getData('dataTable')[index]
+            $('#AssetPutID').val(rowData.AssetPutID)
+            $('#AssetTypeID').val(rowData.AssetTypeID)
+            unionBind(() => $('#AssetID').val(rowData.AssetID))           
+            $('#AssetTypeID, #AssetID').attr('disabled', 'disabled')
+            $('#AssetPutCount').val(rowData.AssetPutCount)
+            $('#AssetPutDate').val(rowData.AssetPutDate)
+            $('#EmpolyReMark').val(rowData.EmpolyReMark)
+            document.getElementById('submitButton').dataset['type'] = 'update'
+            $('#submitButton').text('修改').click(submitClick)
+            $('#AssetPutDate').datetimepicker({
+                //fontAwesome: 'font-awesome',
+                forceParse: 0,
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                weekStart: 1,
+                initialDate: new Date(),
+                autoclose: true,
+            })
+            $('#AssetTypeID').change(function (event) {
+                unionBind()
+            })
+        }
+
+        function submitClick(event) {
+            if (!validateFormat())
+                return false
+
+            if (event.target.dataset['type'] === 'create') {
+                $.ajax({
+                    url: '/AssetPutInfo/Create',
+                    method: 'post',
+                    data: {
+                        AssetID: $('#AssetID').val(),
+                        AssetPutCount: $('#AssetPutCount').val(),
+                        AssetPutDate: $('#AssetPutDate').val(),
+                        AssetPutReMark: $('#AssetPutReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('添加成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('添加失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+            else if (event.target.dataset['type'] === 'update') {
+                $.ajax({
+                    url: '/AssetPutInfo/Update',
+                    method: 'post',
+                    data: {
+                        AssetPutID: $('#AssetPutID').val(),
+                        AssetPutCount: $('#AssetPutCount').val(),
+                        AssetPutDate: $('#AssetPutDate').val(),
+                        AssetPutReMark: $('#AssetPutReMark').val()
+                    },
+                    success: function (_data) {
+                        if (_data.code === 0) {
+                            layer.alert('修改成功', {
+                                title: '提示',
+                                icon: 1
+                            }, index => {
+                                table.reload('dataTable')
+                                layer.close(index)
+                            })
+                            layer.closeAll('page')
+                        }
+                        else {
+                            layer.alert('修改失败', {
+                                title: '提示',
+                                icon: 2
+                            })
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+}
