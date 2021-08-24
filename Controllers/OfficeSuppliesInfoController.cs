@@ -28,9 +28,9 @@ namespace AssetManagement.Controllers
                     AssetID = p.AssetID,
                     AssetName = p.AssetName,
                     AssetPutCount = context.AssetPutInfo.Where(x => x.AssetID == p.AssetID).ToList().Sum(y => y.AssetPutCount),
-                    UsedCount = context.OfficeSuppliesRecordInfo.Where(x => x.AssetID == p.AssetID && !x.OfficeReceiveDate.HasValue).ToList().Sum(y => y.OfficeReceiveNum ?? 0),
+                    UsedCount = context.OfficeSuppliesRecordInfo.Where(x => x.AssetID == p.AssetID).ToList().Sum(y => y.OfficeReceiveNum ?? 0),
                 };
-                tempModel.RemainCount = tempModel.AssetPutCount ?? 0 - tempModel.UsedCount ?? 0;
+                tempModel.RemainCount = (tempModel.AssetPutCount ?? 0) - (tempModel.UsedCount ?? 0);
                 return tempModel;
             });
 
