@@ -59,7 +59,7 @@ namespace AssetManagement.Controllers
                 str.Append("000001");
             else
             {
-                string temp = int.Parse(lastAssetDetailInfo.AssetDetailNum + 1).ToString();
+                string temp = (int.Parse(lastAssetDetailInfo.AssetDetailNum.Replace("GDZC", ""))+1).ToString();
                 while (temp.Length < 6)
                     temp = "0" + temp;
                 str.Append(temp);
@@ -97,8 +97,9 @@ namespace AssetManagement.Controllers
                     transaction.Commit();
                     return Json(new { code = 0 });
                 }
-                catch
+                catch(Exception err)
                 {
+                    Console.WriteLine(err);
                     transaction.Rollback();
                     return Json(new { code = 1 });
                 }
